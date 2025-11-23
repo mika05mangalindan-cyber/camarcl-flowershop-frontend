@@ -74,7 +74,7 @@ export default function Sidebar() {
   /* fetch notifications (memoized) */
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5500/notifications");
+      const res = await axios.get(`${API_URL}/notifications`);
       setNotifications(res.data || []);
     } catch (err) {
       console.error("fetchNotifications error:", err);
@@ -89,7 +89,7 @@ export default function Sidebar() {
       try {
         const mod = await import("socket.io-client"); // dynamic import keeps bundle small
         const { io } = mod;
-        const s = io("http://localhost:5500", { autoConnect: true });
+        const s = io(`${API_URL}`, { autoConnect: true });
         socketRef.current = s;
 
         s.on("new_notification", (notif) => {
@@ -127,7 +127,7 @@ export default function Sidebar() {
   /* handlers - stable with useCallback */
   const markAsRead = useCallback(async (id) => {
     try {
-      await axios.put(`http://localhost:5500/notifications/${id}/read`);
+      await axios.put(`${API_URL}/notifications/${id}/read`);
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
     } catch (err) {
       console.error("markAsRead error:", err);
@@ -136,7 +136,7 @@ export default function Sidebar() {
 
   const deleteNotification = useCallback(async (id) => {
     try {
-      await axios.delete(`http://localhost:5500/notifications/${id}`);
+      await axios.delete(`${API_URL}/notifications/${id}`);
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
       console.error("deleteNotification error:", err);
@@ -151,7 +151,7 @@ export default function Sidebar() {
       const BATCH = 10;
       for (let i = 0; i < unread.length; i += BATCH) {
         const batch = unread.slice(i, i + BATCH);
-        await Promise.all(batch.map((id) => axios.put(`http://localhost:5500/notifications/${id}/read`)));
+        await Promise.all(batch.map((id) => axios.put(`${API_URL}/notifications/${id}/read`)));
       }
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {

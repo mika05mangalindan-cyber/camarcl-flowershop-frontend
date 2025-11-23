@@ -50,7 +50,7 @@ const OrderCard = memo(({ order }) => {
           >
             {item.image_url ? (
               <img
-                src={`http://localhost:5500${item.image_url}`}
+                src={`${API_URL}${item.image_url}`}
                 alt={item.product_name}
                 className="w-16 h-16 rounded-md object-cover"
                 loading="lazy"

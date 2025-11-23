@@ -24,7 +24,7 @@ export default function ProductTable({ products, onEdit, onDelete }) {
               <td className="p-3 border-t border-gray-200 w-20">
                 {product.image_url ? (
                   <img
-                    src={`http://localhost:5500${product.image_url}`}
+                    src={`${API_URL}${product.image_url}`}
                     alt={product.name}
                     width={64}
                     height={64}

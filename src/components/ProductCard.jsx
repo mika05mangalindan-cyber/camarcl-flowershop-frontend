@@ -9,7 +9,7 @@ const ProductCard = memo(({ product, onEdit, onDelete }) => (
     <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md mr-3">
       {product.image_url ? (
         <img
-          src={`http://localhost:5500${product.image_url}`}
+          src={`${API_URL}${product.image_url}`}
           alt={product.name}
           width={80}
           height={80}

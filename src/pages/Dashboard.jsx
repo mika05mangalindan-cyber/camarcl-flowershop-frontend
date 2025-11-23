@@ -38,8 +38,8 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const [ordersRes, usersRes] = await Promise.all([
-          axios.get("http://localhost:5500/orders"),
-          axios.get("http://localhost:5500/users"),
+          axios.get(`${API_URL}/orders`),
+          axios.get(`${API_URL}/users`),
         ]);
         if (!mounted) return;
 
@@ -286,7 +286,7 @@ export default function Dashboard() {
                           {order.items.map(item=>(
                             <div key={item.id} className="flex items-center gap-2">
                               {item.image_url ? (
-                                <img src={`http://localhost:5500${item.image_url}`} alt={item.product_name} className="w-12 h-12 object-cover rounded-md" loading="lazy"/>
+                                <img src={`${API_URL}${item.image_url}`} alt={item.product_name} className="w-12 h-12 object-cover rounded-md" loading="lazy"/>
                               ):(
                                 <div className="w-12 h-12 flex items-center justify-center text-gray-400 text-xs italic rounded-md border border-gray-200">No Img</div>
                               )}

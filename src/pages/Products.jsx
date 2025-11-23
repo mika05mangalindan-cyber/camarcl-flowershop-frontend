@@ -12,7 +12,7 @@ const ProductCard = memo(({ product, onEdit, onDelete }) => (
     <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md mr-3">
       {product.image_url ? (
         <img
-          src={`http://localhost:5500${product.image_url}`}
+          src={`${API_URL}${product.image_url}`}
           alt={product.name}
           width={80}
           height={80}
@@ -84,7 +84,7 @@ export default function Products() {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5500/products");
+      const res = await axios.get(`${API_URL}/products`);
       const data = res.data;
       setProducts(data);
       setFilteredProducts(data);
@@ -161,8 +161,8 @@ export default function Products() {
       else if (editMode && existingImageUrl) data.append("existingImageUrl", existingImageUrl);
 
       try {
-        if (editMode) await axios.put(`http://localhost:5500/products/${selectedId}`, data);
-        else await axios.post("http://localhost:5500/products", data);
+        if (editMode) await axios.put(`${API_URL}/products/${selectedId}`, data);
+        else await axios.post(`${API_URL}/products`, data);
         await fetchProducts();
         setFormData({ name: "", price: "", stock: "", category: "", description: "", image: null });
         setExistingImageUrl(null);
@@ -193,7 +193,7 @@ export default function Products() {
     async id => {
       if (!window.confirm("Are you sure?")) return;
       try {
-        await axios.delete(`http://localhost:5500/products/${id}`);
+        await axios.delete(`${API_URL}products/${id}`);
         fetchProducts();
       } catch (err) {
         console.error(err);
@@ -265,7 +265,7 @@ export default function Products() {
         <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" required className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="Category" className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" className="p-2 border rounded-md md:col-span-2 lg:col-span-3 focus:ring-2 focus:ring-blue-300 outline-none w-full" />
-        {(formData.image || existingImageUrl) && <img src={formData.image ? URL.createObjectURL(formData.image) : `http://localhost:5500${existingImageUrl}`} alt="Product preview" width={96} height={96} className="object-contain w-24 h-24 rounded-md mb-2" />}
+        {(formData.image || existingImageUrl) && <img src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}0${existingImageUrl}`} alt="Product preview" width={96} height={96} className="object-contain w-24 h-24 rounded-md mb-2" />}
         <input type="file" name="image" onChange={handleChange} accept="image/*" className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <button type="submit" onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold shadow-md md:col-span-2 lg:col-span-3 w-full transition-colors duration-150">
           {editMode ? "Update Product" : "Add Product"}

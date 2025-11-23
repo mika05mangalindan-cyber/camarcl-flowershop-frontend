@@ -20,7 +20,7 @@ export default function Profile() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5500/admin/profile");
+      const res = await axios.get(`${API_URL}/admin/profile`);
       setProfile(res.data);
     } catch (err) {
       console.error("Error fetching profile:", err);
@@ -38,7 +38,7 @@ export default function Profile() {
 
   const handleSave = useCallback(async () => {
     try {
-      await axios.put("http://localhost:5500/admin/profile", profile);
+      await axios.put(`${API_URL}/admin/profile`, profile);
       setEditMode(false);
       alert("Profile updated successfully!");
     } catch (err) {

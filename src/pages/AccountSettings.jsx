@@ -22,7 +22,7 @@ export default function AccountSettings() {
 
     try {
       setLoading(true);
-      await axios.put("http://localhost:5500/admin/change-password", passwords);
+      await axios.put(`${API_URL}/admin/change-password`, passwords);
       setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
       alert("Password updated successfully!");
     } catch (err) {
@@ -37,7 +37,7 @@ export default function AccountSettings() {
     if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
 
     try {
-      await axios.delete("http://localhost:5500/admin/delete-account");
+      await axios.delete(`${API_URL}/admin/delete-account`);
       alert("Account deleted successfully!");
       window.location.href = "/";
     } catch (err) {

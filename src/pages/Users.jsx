@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 
-const API_URL = "http://localhost:5500/users";
+const API_URL = `${API_URL}/users`;
 
 /* ---------- Tiny inline icons ---------- */
 const IconUser = ({ className = "w-5 h-5" }) => (

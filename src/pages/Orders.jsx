@@ -25,7 +25,7 @@ const OrderCard = memo(({ order, onStatusChange }) => (
         <div key={item.id} className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
           {item.image_url ? (
             <img
-              src={item.image_url.startsWith("http") ? item.image_url : `http://localhost:5500${item.image_url}`}
+              src={item.image_url.startsWith("http") ? item.image_url : `${API_URL}${item.image_url}`}
               alt={item.product_name}
               className="w-16 h-16 object-cover rounded-md flex-shrink-0"
               loading="lazy"
@@ -77,7 +77,7 @@ export default function Orders() {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5500/orders");
+      const res = await axios.get(`${API_URL}/orders`);
 
       const groupedOrders = res.data.reduce((acc, row) => {
         let order = acc.find(o => o.id === row.order_id);
@@ -116,7 +116,7 @@ export default function Orders() {
   // Status update
   const handleStatusChange = useCallback(async (orderId, newStatus) => {
     try {
-      await axios.put(`http://localhost:5500/orders/${orderId}/status`, { status: newStatus });
+      await axios.put(`${API_URL}/orders/${orderId}/status`, { status: newStatus });
       fetchOrders();
     } catch (err) { console.error(err); }
   }, [fetchOrders]);
@@ -270,7 +270,7 @@ export default function Orders() {
                     <div key={i.id} className="flex items-center gap-2 mb-1">
                       {i.image_url ? (
                         <img
-                          src={i.image_url.startsWith("http") ? i.image_url : `http://localhost:5500${i.image_url}`}
+                          src={i.image_url.startsWith("http") ? i.image_url : `${API_URL}${i.image_url}`}
                           alt={i.product_name}
                           className="w-10 h-10 object-cover rounded-md flex-shrink-0"
                           loading="lazy"

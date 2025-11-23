@@ -18,7 +18,7 @@ export default function Inventory() {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5500/products");
+      const res = await axios.get(`${API_URL}`/products``);
       setProducts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);

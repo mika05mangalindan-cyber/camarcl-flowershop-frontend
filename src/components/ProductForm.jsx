@@ -47,7 +47,7 @@ export default function ProductForm({ onSubmit, initialData = {}, editMode = fal
       <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" className="p-2 border rounded-md md:col-span-2 lg:col-span-3 focus:ring-2 focus:ring-blue-300 outline-none w-full" />
       {(formData.image || existingImageUrl) && (
         <img
-          src={formData.image ? URL.createObjectURL(formData.image) : `http://localhost:5500${existingImageUrl}`}
+          src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}${existingImageUrl}`}
           alt="Product preview"
           width={96}
           height={96}
