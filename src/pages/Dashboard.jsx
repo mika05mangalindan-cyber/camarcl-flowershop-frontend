@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useCallback, Suspense } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Lazy-load heavy libraries and components
 const XLSX = React.lazy(() => import("xlsx"));
 const jsPDF = React.lazy(() => import("jspdf"));

@@ -4,6 +4,8 @@ import debounce from "lodash.debounce";
 import ProductCard from "../components/ProductCard";
 import ProductTable from "../components/ProductTable";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Inventory() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);

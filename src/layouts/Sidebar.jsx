@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { NavLink, Outlet } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 /* --- Inline icons (tiny, avoids lucide-react bundle) --- */
 const IconMenu = (props) => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...props}>

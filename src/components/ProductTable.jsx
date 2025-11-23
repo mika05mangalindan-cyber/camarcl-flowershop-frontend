@@ -1,5 +1,7 @@
 import React, { Suspense, lazy } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Lazy load icons
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 const FiTrash2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiTrash2 })));

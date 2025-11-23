@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback, Suspense, lazy } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Lazy load react-icons for performance
 const FiUser = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiUser })));
 const FiSave = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiSave })));

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 
-const API_URL = `${API_URL}/users`;
+const API_URL = import.meta.env.VITE_API_URL;
+const USERS_API_URL = `${API_URL}/users`;
 
 /* ---------- Tiny inline icons ---------- */
 const IconUser = ({ className = "w-5 h-5" }) => (

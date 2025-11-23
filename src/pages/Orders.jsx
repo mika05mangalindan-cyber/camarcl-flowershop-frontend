@@ -5,6 +5,8 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Helper: status color
 const getStatusColor = (status) => {
   switch (status.toLowerCase()) {

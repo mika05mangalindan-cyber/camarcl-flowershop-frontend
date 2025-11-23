@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 /* small inline icons to avoid importing an icon lib */
 const IconBell = ({ className = "", ...props }) => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>

@@ -1,5 +1,8 @@
 import React, { memo, useMemo } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 // Memoized OrderCard for small/medium screens
 const OrderCard = memo(({ order }) => {
   // Calculate total
