@@ -11,7 +11,7 @@ const ProductCard = memo(({ product, onEdit, onDelete }) => (
     <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md mr-3 bg-gray-50">
       {product.image_url ? (
         <img
-          src={`${API_URL}${product.image_url}`}
+          src={product.image_url}
           alt={product.name}
           width={80}
           height={80}
