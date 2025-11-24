@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import ProductCard from "../components/ProductCard";
-import ProductTable from "../components/ProductTable";
+import InventoryTable from "../components/InventoryCard";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
@@ -165,14 +164,15 @@ export default function Inventory() {
       </div>
 
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
-        {currentProducts.map(p => <ProductCard key={p.id} product={p} />)}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {currentProducts.map(p => <InventoryCard key={p.id} product={p} />)}
       </div>
 
 
-      <div className="hidden md:block">
-        <ProductTable products={currentProducts} />
-      </div>
+
+      {/* <div className="hidden md:block">
+        <InventoryTable products={currentProducts} />
+      </div> */}
 
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">

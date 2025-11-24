@@ -225,7 +225,7 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-        <div className="w-full h-[300px] sm:h-[400px] md:h-[450px]">
+        <div className="w-full h-[300px] sm:h-[400px] md:h-[450px] min-h-0">
           <Suspense fallback={<p className="text-gray-500 text-center">Loading chart...</p>}>
             <BarChartWrapper data={salesData} colors={categoryColors} />
           </Suspense>
