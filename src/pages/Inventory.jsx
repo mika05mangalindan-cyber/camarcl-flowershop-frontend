@@ -172,7 +172,7 @@ export default function Inventory() {
 
 
 
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <InventoryTable products={currentProducts} />
       </div>
 
