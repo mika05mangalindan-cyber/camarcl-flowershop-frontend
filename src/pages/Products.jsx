@@ -164,8 +164,15 @@ export default function Products() {
       else if (editMode && existingImageUrl) data.append("existingImageUrl", existingImageUrl);
 
       try {
-        if (editMode) await axios.put(`${PRODUCTS_API}/${selectedId}`, data);
-        else await axios.post(PRODUCTS_API, data);
+        if (editMode) {
+          await axios.put(`${PRODUCTS_API}/${selectedId}`, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else {
+          await axios.post(PRODUCTS_API, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        }
         await fetchProducts();
         setFormData({ name: "", price: "", stock: "", category: "", description: "", image: null });
         setExistingImageUrl(null);
@@ -174,6 +181,7 @@ export default function Products() {
       } catch (err) {
         console.error(err);
       }
+
     },
     [editMode, selectedId, formData, existingImageUrl, fetchProducts]
   );
