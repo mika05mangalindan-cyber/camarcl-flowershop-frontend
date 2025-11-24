@@ -240,73 +240,73 @@ export default function Dashboard() {
             <input
               type="text"
               value={searchQuery}
-              onChange={e=>setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search orders..."
               className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-200 bg-white"
             />
           </div>
         </div>
 
-        {filteredOrders.length === 0 ? (
-          <p className="text-gray-500 italic text-center">No orders match your search.</p>
-        ) : (
-          <>
-        
-            <div className="hidden md:block overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-              <table className="min-w-full border-collapse">
-                <thead className="bg-blue-600 text-white">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold">Name</th>
-                    <th className="px-4 py-3 text-left font-semibold">Products</th>
-                    <th className="px-4 py-3 text-center font-semibold">Qty</th>
-                    <th className="px-4 py-3 text-center font-semibold">Payment</th>
-                    <th className="px-4 py-3 text-center font-semibold">Total</th>
-                    <th className="px-4 py-3 text-center font-semibold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.map(order=>{
-                    const orderTotal = order.items.reduce((sum,i)=>sum+Number(i.total||0),0);
-                    return (
-                      <tr key={order.order_id} className="hover:bg-blue-50 transition-colors border-b border-gray-200">
-                        <td className="px-4 py-3 align-middle">
-                          <div className="text-gray-500 text-sm mb-1">{new Date(order.created_at.replace(" ","T")).toLocaleDateString()}</div>
-                          <div className="font-semibold text-gray-800">{order.user_name}</div>
-                        </td>
-                        <td className="px-4 py-3 space-y-1 align-middle">
-                          {order.items.map(item => (
-                            <div key={item.id} className="flex items-center gap-2">
-                              {item.image_url ? (
-                                <img
-                                  src={item.image_url.startsWith("http") ? item.image_url : `${API_URL}${item.image_url}`}
-                                  alt={item.product_name}
-                                  className="w-12 h-12 object-cover rounded-md"
-                                  loading="lazy"
-                                  decoding="async"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 flex items-center justify-center text-gray-400 text-xs italic rounded-md border border-gray-200">
-                                  No Img
-                                </div>
-                              )}
-                              <span>{item.product_name}</span>
-                            </div>
-                          ))}
 
-                        </td>
-                        <td className="px-4 py-3 text-center align-middle space-y-1">{order.items.map(i=><div key={i.id}>{i.quantity}</div>)}</td>
-                        <td className="px-4 py-3 text-center font-semibold text-gray-700 align-middle">{order.payment_mode}</td>
-                        <td className="px-4 py-3 text-center font-semibold text-red-500 align-middle">PHP {orderTotal.toLocaleString()}.00</td>
-                        <td className={`px-4 py-3 text-center font-semibold align-middle ${order.status.toLowerCase()==="delivered"?"text-green-700":order.status.toLowerCase()==="pending"?"text-orange-700":"text-red-700"}`}>{order.status}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+       {filteredOrders.length === 0 ? (
+    <p className="text-gray-500 italic text-center">No orders match your search.</p>
+  ) : (
+    <>
+     
+      <div className="hidden lg:block overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <table className="min-w-full border-collapse">
+          <thead className="bg-blue-600 text-white">
+            <tr>
+              <th className="px-4 py-3 text-left font-semibold">Name</th>
+              <th className="px-4 py-3 text-left font-semibold">Products</th>
+              <th className="px-4 py-3 text-center font-semibold">Qty</th>
+              <th className="px-4 py-3 text-center font-semibold">Payment</th>
+              <th className="px-4 py-3 text-center font-semibold">Total</th>
+              <th className="px-4 py-3 text-center font-semibold">Status</th>
+            </tr>
+          </thead>
+          
+          <tbody>
+            {filteredOrders.map(order => {
+              const orderTotal = order.items.reduce((sum, i) => sum + Number(i.total || 0), 0);
+              return (
+                <tr key={order.order_id} className="hover:bg-blue-50 transition-colors border-b border-gray-200">
+                  <td className="px-4 py-3 align-middle">
+                    <div className="text-gray-500 text-sm mb-1">{new Date(order.created_at.replace(" ", "T")).toLocaleDateString()}</div>
+                    <div className="font-semibold text-gray-800">{order.user_name}</div>
+                  </td>
+                  <td className="px-4 py-3 space-y-1 align-middle">
+                    {order.items.map(item => (
+                      <div key={item.id} className="flex items-center gap-2">
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url.startsWith("http") ? item.image_url : `${API_URL}${item.image_url}`}
+                            alt={item.product_name}
+                            className="w-12 h-12 object-cover rounded-md"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 flex items-center justify-center text-gray-400 text-xs italic rounded-md border border-gray-200">
+                            No Img
+                          </div>
+                        )}
+                        <span className="truncate">{item.product_name}</span>
+                      </div>
+                    ))}
+                  </td>
+                  <td className="px-4 py-3 text-center align-middle space-y-1">{order.items.map(i => <div key={i.id}>{i.quantity}</div>)}</td>
+                  <td className="px-4 py-3 text-center font-semibold text-gray-700 align-middle">{order.payment_mode}</td>
+                  <td className="px-4 py-3 text-center font-semibold text-red-500 align-middle">PHP {orderTotal.toLocaleString()}.00</td>
+                  <td className={`px-4 py-3 text-center font-semibold align-middle ${order.status.toLowerCase() === "delivered" ? "text-green-700" : order.status.toLowerCase() === "pending" ? "text-orange-700" : "text-red-700"}`}>{order.status}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+          </table>
+         </div>
 
           
-            <div className="hidden sm:grid md:hidden grid-cols-2 gap-4 overflow-x-auto">
+             <div className="hidden sm:grid md:grid-cols-2 lg:hidden gap-4">
               {filteredOrders.map(o => (
                 <Suspense key={o.order_id} fallback={<p>Loading order...</p>}>
                   <OrderCard order={o} />
@@ -315,7 +315,7 @@ export default function Dashboard() {
             </div>
 
      
-            <div className="sm:hidden grid gap-4 overflow-x-auto">
+            <div className="sm:hidden grid grid-cols-1 gap-4">
               {filteredOrders.map(o => (
                 <Suspense key={o.order_id} fallback={<p>Loading order...</p>}>
                   <OrderCard order={o} />
