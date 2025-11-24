@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, memo, lazy, Suspense, useMemo 
 import axios from "axios";
 import debounce from "lodash.debounce";
 
-const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
 
 // Lazy load icons

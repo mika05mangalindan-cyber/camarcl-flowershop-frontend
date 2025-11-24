@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, Suspense } from "react";
 import axios from "axios";
 
-const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_URL = process.env.REACT_APP_API_URL;
 
 // Lazy-load components
 const BarChartWrapper = React.lazy(() => import("../components/BarChartWrapper"));

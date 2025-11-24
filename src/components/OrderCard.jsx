@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from "react";
 
-const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_URL = process.env.REACT_APP_API_URL;
 
 // Memoized OrderCard for small/medium screens
 const OrderCard = memo(({ order }) => {

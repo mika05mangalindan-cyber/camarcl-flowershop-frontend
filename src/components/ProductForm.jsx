@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_URL = process.env.REACT_APP_API_URL;
 
 
 export default function ProductForm({ onSubmit, initialData = {}, editMode = false }) {
