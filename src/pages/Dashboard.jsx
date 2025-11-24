@@ -306,7 +306,7 @@ export default function Dashboard() {
             </div>
 
           
-            <div className="hidden sm:grid md:hidden grid-cols-2 gap-4">
+            <div className="hidden sm:grid md:hidden grid-cols-2 gap-4 overflow-x-auto">
               {filteredOrders.map(o => (
                 <Suspense key={o.order_id} fallback={<p>Loading order...</p>}>
                   <OrderCard order={o} />
@@ -315,7 +315,7 @@ export default function Dashboard() {
             </div>
 
      
-            <div className="sm:hidden grid gap-4">
+            <div className="sm:hidden grid gap-4 overflow-x-auto">
               {filteredOrders.map(o => (
                 <Suspense key={o.order_id} fallback={<p>Loading order...</p>}>
                   <OrderCard order={o} />

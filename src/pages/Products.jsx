@@ -13,7 +13,7 @@ const ProductCard = memo(({ product, onEdit, onDelete }) => (
     <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md mr-3 bg-gray-50">
       {product.image_url ? (
         <img
-          src={product.image_url.startsWith("http") ? product.image_url : `${API_URL}${product.image_url}`}
+          src={product.image_url || ""}
           alt={product.name}
           width={80}
           height={80}
@@ -252,7 +252,7 @@ const handleDelete = useCallback(async (id) => {
                   <tr key={product.id} className="hover:bg-blue-50 border-t border-gray-200 transition-all duration-200">
                     <td className="p-3 border-t border-gray-200 w-20">
                       {product.image_url ? (
-                        <img src={product.image_url.startsWith("http") ? product.image_url : `${API_URL}${product.image_url}`} alt={product.name} width={64} height={64} className="w-16 h-16 object-contain rounded-md" loading="lazy" />
+                        <img src={product.image_url || ""} alt={product.name} width={64} height={64} className="w-16 h-16 object-contain rounded-md" loading="lazy" />
                       ) : <div className="w-16 h-16 bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic">No Img</div>}
                     </td>
                     <td className="p-3 border-t border-gray-200 font-medium">{product.name}</td>
