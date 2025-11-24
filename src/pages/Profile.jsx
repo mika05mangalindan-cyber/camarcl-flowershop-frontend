@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-// Lazy load react-icons for performance
+
 const FiUser = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiUser })));
 const FiSave = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiSave })));
 const FiX = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiX })));

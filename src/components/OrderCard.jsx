@@ -2,15 +2,15 @@ import React, { memo, useMemo } from "react";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-// Memoized OrderCard for small/medium screens
+
 const OrderCard = memo(({ order }) => {
-  // Calculate total
+  
   const orderTotal = useMemo(
     () => order.items.reduce((sum, item) => sum + Number(item.total || 0), 0),
     [order.items]
   );
 
-  // Status styles
+  
   const getStatusClasses = (status) => {
     switch (status?.toLowerCase()) {
       case "pending":
@@ -38,13 +38,13 @@ const OrderCard = memo(({ order }) => {
 
   return (
     <div className="bg-white border rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col gap-3">
-      {/* Header */}
+ 
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-gray-800 truncate">{order.user_name || "Unknown User"}</h3>
         <span className="text-gray-500 text-sm">{formattedDate}</span>
       </div>
 
-      {/* Items */}
+
       <div className="grid gap-2">
         {order.items.map((item) => (
           <div
@@ -53,7 +53,7 @@ const OrderCard = memo(({ order }) => {
           >
             {item.image_url ? (
               <img
-                src={`${API_URL}${item.image_url}`}
+                src={item.image_url.startsWith("http") ? item.image_url : `${API_URL}${item.image_url}`}
                 alt={item.product_name || "Product Image"}
                 className="w-16 h-16 rounded-md object-cover"
                 loading="lazy"
@@ -75,7 +75,7 @@ const OrderCard = memo(({ order }) => {
         ))}
       </div>
 
-      {/* Footer */}
+
       <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
         <span className="font-semibold text-gray-800">
           Total: PHP {orderTotal.toLocaleString()}.00

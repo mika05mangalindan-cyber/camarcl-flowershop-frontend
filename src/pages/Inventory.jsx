@@ -17,7 +17,7 @@ export default function Inventory() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showExportMenu, setShowExportMenu] = useState(false);
 
-  // Fetch products
+
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
@@ -35,10 +35,10 @@ export default function Inventory() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Unique categories for filter
+  
   const categories = useMemo(() => ["All", ...new Set(products.map(p => p.category).filter(Boolean))], [products]);
 
-  // Debounced search
+  
   const handleSearchChange = useMemo(() => debounce(value => {
     setSearchQuery(value.toLowerCase());
     setCurrentPage(1);
@@ -48,7 +48,7 @@ export default function Inventory() {
     return () => handleSearchChange.cancel();
   }, [handleSearchChange]);
 
-  // Filter, search, and sort products
+
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
@@ -61,7 +61,7 @@ export default function Inventory() {
     return result;
   }, [products, categoryFilter, sortOrder, searchQuery]);
 
-  // Pagination
+
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
@@ -84,7 +84,7 @@ export default function Inventory() {
     setShowExportMenu(false);
   }, [filteredProducts]);
 
-  // Export to PDF
+
   const exportToPDF = useCallback(async () => {
     const { jsPDF } = await import("jspdf");
     const autoTable = (await import("jspdf-autotable")).default;
@@ -124,11 +124,11 @@ export default function Inventory() {
 
   return (
     <main className="p-4 sm:p-6 space-y-6">
-      {/* Header + Filters + Search + Export */}
+     
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-wrap">
         <h1 className="text-2xl font-semibold text-gray-800">Inventory</h1>
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Category Filter */}
+        
           <div className="flex items-center gap-2">
             <label htmlFor="categoryFilter" className="text-gray-600 text-sm font-medium">Filter:</label>
             <select id="categoryFilter" value={categoryFilter} onChange={e => { setCategoryFilter(e.target.value); setCurrentPage(1); }} className="p-2 border rounded-md text-sm">
@@ -136,7 +136,7 @@ export default function Inventory() {
             </select>
           </div>
 
-          {/* Sort */}
+          
           <div className="flex items-center gap-2">
             <label htmlFor="sortOrder" className="text-gray-600 text-sm font-medium">Sort:</label>
             <select id="sortOrder" value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="p-2 border rounded-md text-sm">
@@ -146,12 +146,12 @@ export default function Inventory() {
             </select>
           </div>
 
-          {/* Search */}
+
           <div className="flex items-center gap-2">
             <input type="text" placeholder="Search product..." onChange={e => handleSearchChange(e.target.value)} className="p-2 border rounded-md text-sm" />
           </div>
 
-          {/* Export Menu */}
+
           <div className="relative">
             <button onClick={() => setShowExportMenu(prev => !prev)} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium">Generate Report</button>
             {showExportMenu && (
@@ -164,17 +164,17 @@ export default function Inventory() {
         </div>
       </div>
 
-      {/* Mobile Cards */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
         {currentProducts.map(p => <ProductCard key={p.id} product={p} />)}
       </div>
 
-      {/* Desktop Table */}
+
       <div className="hidden md:block">
         <ProductTable products={currentProducts} />
       </div>
 
-      {/* Pagination */}
+
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
         <div className="flex items-center gap-2">
           <span className="text-gray-600 text-sm">Show:</span>

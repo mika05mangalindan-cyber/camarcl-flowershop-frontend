@@ -5,17 +5,17 @@ import debounce from "lodash.debounce";
 const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
 
-// Lazy load icons
+
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 const FiTrash2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiTrash2 })));
 
-// Memoized Product Card
+
 const ProductCard = memo(({ product, onEdit, onDelete }) => (
   <div className="bg-white shadow-sm rounded-xl p-3 flex hover:bg-blue-50 transition-transform transform hover:scale-[1.02] duration-150">
     <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md mr-3">
       {product.image_url ? (
         <img
-          src={product.image_url}
+          src={product.image_url.startsWith("http") ? product.image_url : `${API_URL}${product.image_url}`}
           alt={product.name}
           width={80}
           height={80}
@@ -83,7 +83,7 @@ export default function Products() {
   const [loading, setLoading] = useState(false);
   const [showReportOptions, setShowReportOptions] = useState(false);
 
-  // Fetch products
+ 
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
@@ -103,7 +103,7 @@ export default function Products() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Filter & sort
+
   const applyFilterAndSort = useCallback(
     (filter, sort) => {
       let updated = [...products];
@@ -205,7 +205,7 @@ export default function Products() {
     [fetchProducts]
   );
 
-  // Report generation
+
   const handleExportPDF = useCallback(async () => {
     requestIdleCallback(async () => {
       const { jsPDF } = await import("jspdf");
@@ -252,7 +252,7 @@ export default function Products() {
     });
   }, [filteredProducts]);
 
-  // Pagination & search
+
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentProducts = useMemo(() => filteredProducts.slice(indexOfFirst, indexOfLast), [filteredProducts, indexOfFirst, indexOfLast]);
@@ -261,21 +261,38 @@ export default function Products() {
 
   return (
     <main className="p-4 sm:p-6 lg:p-8">
-      {/* Product Form */}
+ 
       <section className="bg-white p-6 rounded-2xl shadow-sm md:shadow-md mb-6 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Product Name" required className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price" required className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" required className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <input type="text" name="category" value={formData.category} onChange={handleChange} placeholder="Category" className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" className="p-2 border rounded-md md:col-span-2 lg:col-span-3 focus:ring-2 focus:ring-blue-300 outline-none w-full" />
-        {(formData.image || existingImageUrl) && <img src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}${existingImageUrl}`} alt="Product preview" width={96} height={96} className="object-contain w-24 h-24 rounded-md mb-2" />}
+        {(formData.image || existingImageUrl) && 
+        
+        <img
+        src={
+          formData.image
+            ? URL.createObjectURL(formData.image)
+            : existingImageUrl?.startsWith("http")
+            ? existingImageUrl
+            : `${API_URL}${existingImageUrl}`
+            }
+            alt="Product preview"
+            width={96}
+            height={96}
+            className="object-contain w-24 h-24 rounded-md mb-2"
+          />
+            }
+
+
         <input type="file" name="image" onChange={handleChange} accept="image/*" className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
         <button type="submit" onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-semibold shadow-md md:col-span-2 lg:col-span-3 w-full transition-colors duration-150">
           {editMode ? "Update Product" : "Add Product"}
         </button>
       </section>
 
-      {/* Filter, Sort & Search */}
+    
       <section className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4 flex-wrap">
         <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Products</h1>
         <div className="flex gap-2 items-center flex-wrap">
@@ -308,7 +325,7 @@ export default function Products() {
         </div>
       </section>
 
-  {/* Products Table / Mobile Cards */}
+
 {loading ? (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
     {Array.from({ length: 5 }).map((_, i) => (
@@ -319,7 +336,7 @@ export default function Products() {
   <p className="text-center p-6 text-gray-500 italic">No products found.</p>
 ) : (
   <>
-    {/* Desktop Table */}
+    
     <div className="overflow-x-auto hidden lg:block rounded-2xl border">
       <table className="min-w-full text-sm border-collapse">
         <thead>
@@ -338,13 +355,14 @@ export default function Products() {
               <td className="p-3 border-t border-gray-200 w-20">
                 {product.image_url ? (
                   <img
-                    src={product.image_url}
+                    src={product.image_url?.startsWith("http") ? product.image_url : `${API_URL}${product.image_url}`}
                     alt={product.name}
                     width={64}
                     height={64}
                     className="w-16 h-16 object-contain rounded-md"
                     loading="lazy"
                   />
+
                 ) : (
                   <div className="w-16 h-16 bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic">No Img</div>
                 )}
@@ -369,14 +387,14 @@ export default function Products() {
       </table>
     </div>
 
-    {/* Mobile Cards */}
+  
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:hidden gap-3">
       {searchedProducts.map(product => <ProductCard key={product.id} product={product} onEdit={handleEdit} onDelete={handleDelete} />)}
     </div>
   </>
 )}
 
-      {/* Pagination */}
+
       <section className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6 flex-wrap">
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-gray-600 text-sm">Show:</span>

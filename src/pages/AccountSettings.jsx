@@ -56,7 +56,7 @@ export default function AccountSettings() {
           Account Settings
         </h1>
 
-        {/* Change Password Card */}
+
         <section className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-6">
           <h2 className="text-2xl font-semibold text-gray-700">Change Password</h2>
           <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }}>
@@ -88,7 +88,7 @@ export default function AccountSettings() {
           </form>
         </section>
 
-        {/* Delete Account Card */}
+     
         <section className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-4 border border-red-100">
           <h2 className="text-2xl font-semibold text-gray-700">Delete Account</h2>
           <p className="text-sm text-gray-500">

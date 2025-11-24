@@ -26,12 +26,13 @@ export default function ProductTable({ products, onEdit, onDelete }) {
               <td className="p-3 border-t border-gray-200 w-20">
                 {product.image_url ? (
                   <img
-                    src={product.image_url}
+                    src={product.image_url.startsWith("http") ? product.image_url : `${API_URL}${product.image_url}`}
                     alt={product.name}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-contain rounded-md"
+                    width={80}
+                    height={80}
+                    className="object-contain w-full h-full"
                     loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div className="w-16 h-16 bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic">No Img</div>

@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-// Lazy-load components
+
 const BarChartWrapper = React.lazy(() => import("../components/BarChartWrapper"));
 const OrderCard = React.lazy(() => import("../components/OrderCard"));
 
@@ -93,7 +93,7 @@ export default function Dashboard() {
           .slice(0,5)
         );
 
-        // Sales data
+
         const applySalesFilter = () => {
           let filtered = deliveredOrders;
           if (salesMonthFilter !== "all") {
@@ -198,7 +198,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Sales Chart */}
+      
       <div className="bg-white shadow-md rounded-xl p-6 relative w-full">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
           <h2 className="text-lg font-semibold text-gray-800">Sales by Category</h2>
@@ -232,7 +232,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Orders */}
+      
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <h2 className="text-lg font-semibold text-gray-800">Recent Orders</h2>
@@ -251,7 +251,7 @@ export default function Dashboard() {
           <p className="text-gray-500 italic text-center">No orders match your search.</p>
         ) : (
           <>
-            {/* Desktop Table */}
+        
             <div className="hidden md:block overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
               <table className="min-w-full border-collapse">
                 <thead className="bg-blue-600 text-white">
@@ -274,16 +274,25 @@ export default function Dashboard() {
                           <div className="font-semibold text-gray-800">{order.user_name}</div>
                         </td>
                         <td className="px-4 py-3 space-y-1 align-middle">
-                          {order.items.map(item=>(
+                          {order.items.map(item => (
                             <div key={item.id} className="flex items-center gap-2">
                               {item.image_url ? (
-                                <img src={`${API_URL}${item.image_url}`} alt={item.product_name} className="w-12 h-12 object-cover rounded-md" loading="lazy"/>
-                              ):(
-                                <div className="w-12 h-12 flex items-center justify-center text-gray-400 text-xs italic rounded-md border border-gray-200">No Img</div>
+                                <img
+                                  src={item.image_url.startsWith("http") ? item.image_url : `${API_URL}${item.image_url}`}
+                                  alt={item.product_name}
+                                  className="w-12 h-12 object-cover rounded-md"
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 flex items-center justify-center text-gray-400 text-xs italic rounded-md border border-gray-200">
+                                  No Img
+                                </div>
                               )}
                               <span>{item.product_name}</span>
                             </div>
                           ))}
+
                         </td>
                         <td className="px-4 py-3 text-center align-middle space-y-1">{order.items.map(i=><div key={i.id}>{i.quantity}</div>)}</td>
                         <td className="px-4 py-3 text-center font-semibold text-gray-700 align-middle">{order.payment_mode}</td>
@@ -296,7 +305,7 @@ export default function Dashboard() {
               </table>
             </div>
 
-            {/* Medium screens */}
+          
             <div className="hidden sm:grid md:hidden grid-cols-2 gap-4">
               {filteredOrders.map(o => (
                 <Suspense key={o.order_id} fallback={<p>Loading order...</p>}>
@@ -305,7 +314,7 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* Small screens */}
+     
             <div className="sm:hidden grid gap-4">
               {filteredOrders.map(o => (
                 <Suspense key={o.order_id} fallback={<p>Loading order...</p>}>

@@ -5,7 +5,6 @@ import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 
 
-/* --- Inline icons (tiny, avoids lucide-react bundle) --- */
 const IconMenu = (props) => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M4 6h16M4 12h16M4 18h16" />
@@ -50,7 +49,6 @@ const IconTrash = (props) => (
   </svg>
 );
 
-/* --- Sidebar component (optimized) --- */
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -60,7 +58,7 @@ export default function Sidebar() {
   const socketRef = useRef(null);
   const audioRef = useRef(null);
 
-  /* initialize audio once */
+
   useEffect(() => {
     const a = new Audio("/notification.mp3");
     a.preload = "auto";
@@ -71,10 +69,10 @@ export default function Sidebar() {
     const a = audioRef.current;
     if (!a) return;
     a.currentTime = 0;
-    a.play().catch(() => {}); // suppressed autoplay errors
+    a.play().catch(() => {}); 
   }, []);
 
-  /* fetch notifications (memoized) */
+
   const fetchNotifications = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}/notifications`);
@@ -84,13 +82,12 @@ export default function Sidebar() {
     }
   }, []);
 
-  /* connect socket lazily on mount */
-  useEffect(() => {
+    useEffect(() => {
     let mounted = true;
 
     (async () => {
       try {
-        const mod = await import("socket.io-client"); // dynamic import keeps bundle small
+        const mod = await import("socket.io-client"); 
         const { io } = mod;
         const s = io(`${API_URL}`, { autoConnect: true });
         socketRef.current = s;
@@ -98,14 +95,14 @@ export default function Sidebar() {
         s.on("new_notification", (notif) => {
           setNotifications((prev) => {
             const next = [notif, ...prev];
-            // keep a sane cap to avoid unbounded lists
+            
             return next.length > 200 ? next.slice(0, 200) : next;
           });
           playSound();
         });
 
         s.on("connect_error", (err) => {
-          // handle connecting issues silently
+        
           console.debug("socket connect_error", err);
         });
       } catch (err) {
@@ -124,10 +121,9 @@ export default function Sidebar() {
     };
   }, [fetchNotifications, playSound]);
 
-  /* derived values */
   const unreadCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
 
-  /* handlers - stable with useCallback */
+
   const markAsRead = useCallback(async (id) => {
     try {
       await axios.put(`${API_URL}/notifications/${id}/read`);
@@ -150,7 +146,7 @@ export default function Sidebar() {
     try {
       const unread = notifications.filter((n) => !n.isRead).map((n) => n.id);
       if (unread.length === 0) return;
-      // batch requests to avoid flooding
+
       const BATCH = 10;
       for (let i = 0; i < unread.length; i += BATCH) {
         const batch = unread.slice(i, i + BATCH);
@@ -168,7 +164,7 @@ export default function Sidebar() {
     if (!showNotifications) fetchNotifications();
   }, [showNotifications, fetchNotifications]);
 
-  /* nav link style helper */
+
   const linkClass = useCallback(({ isActive }) =>
     `block px-4 py-2 rounded-lg transition-all duration-200 ${
       isActive ? "bg-white text-green-700 font-semibold shadow" : "text-gray-200 hover:bg-green-600 hover:text-white hover:shadow-green-400/30"
@@ -177,12 +173,12 @@ export default function Sidebar() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
+  
       <aside
         className={`fixed top-0 left-0 z-40 h-full w-64 bg-green-700 text-white p-6 flex flex-col transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        {/* Mobile Header */}
+        
         <div className="flex justify-between items-center mb-6 lg:hidden">
           <h2 className="text-xl font-bold tracking-wide">Camarcl Admin</h2>
           <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-300 focus:outline-none" aria-label="Close sidebar">
@@ -190,12 +186,12 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Desktop Header */}
+   
         <div className="hidden lg:block mb-6">
           <h2 className="text-2xl font-bold tracking-wide">Camarcl Admin</h2>
         </div>
 
-        {/* Navigation */}
+
         <nav className="flex-1 overflow-y-auto">
           <ul className="space-y-2">
             {[
@@ -219,9 +215,9 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Main Content */}
+
       <div className="flex flex-col flex-1 lg:ml-64">
-        {/* Header */}
+
         <header className="fixed top-0 left-0 lg:left-64 right-0 z-30 bg-white shadow-md flex justify-between items-center px-4 lg:px-8 py-3">
           <button onClick={() => setIsOpen((s) => !s)} className="text-green-700 lg:hidden focus:outline-none" aria-label="Open sidebar">
             <IconMenu />
@@ -230,7 +226,7 @@ export default function Sidebar() {
           <h1 className="text-xl font-bold text-green-700 tracking-wide">Camarcl Flowershop</h1>
 
           <div className="flex items-center space-x-4">
-            {/* Notifications */}
+            
             <div className="relative">
               <button onClick={onToggleNotifications} className="relative focus:outline-none" aria-label="Notifications" aria-expanded={showNotifications}>
                 <IconBell className="h-6 w-6 text-gray-600" />
@@ -265,7 +261,7 @@ export default function Sidebar() {
               )}
             </div>
 
-            {/* User Menu */}
+
             <div className="relative">
               <button onClick={() => setUserMenuOpen((s) => !s)} className="flex items-center space-x-2 bg-green-600 text-white px-3 py-1.5 rounded-full focus:outline-none hover:bg-green-700 transition" aria-haspopup="true" aria-expanded={userMenuOpen}>
                 <IconUser />

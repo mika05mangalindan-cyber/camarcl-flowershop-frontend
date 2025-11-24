@@ -8,7 +8,6 @@ import autoTable from "jspdf-autotable";
 const API_URL = process.env.REACT_APP_API_URL;
 const ORDERS_API = `${API_URL}/orders`;
 
-// Helper: status color
 const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
     case "delivered": return "text-green-600";
@@ -18,7 +17,7 @@ const getStatusColor = (status) => {
   }
 };
 
-// Mobile Order Card
+
 const OrderCard = memo(({ order, onStatusChange }) => (
   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 hover:bg-blue-50 transition-transform duration-200">
     <h2 className="font-semibold text-lg mb-3">{order.user_name}</h2>
@@ -32,6 +31,7 @@ const OrderCard = memo(({ order, onStatusChange }) => (
               alt={item.product_name}
               className="w-16 h-16 object-cover rounded-md flex-shrink-0"
               loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="w-16 h-16 bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic rounded-md flex-shrink-0">
@@ -74,11 +74,11 @@ export default function Orders() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Fetch orders
+
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(ORDERS_API); // ✅ use ORDERS_API
+      const res = await axios.get(ORDERS_API); 
 
       const groupedOrders = res.data.reduce((acc, row) => {
         let order = acc.find(o => o.id === row.order_id);
@@ -114,7 +114,7 @@ export default function Orders() {
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // Status update
+
   const handleStatusChange = useCallback(async (orderId, newStatus) => {
     try {
       await axios.put(`${ORDERS_API}/${orderId}/status`, { status: newStatus }); // ✅ use ORDERS_API
@@ -122,26 +122,26 @@ export default function Orders() {
     } catch (err) { console.error(err); }
   }, []);
 
-  // Debounced search
+ 
   const handleSearchChange = useMemo(() => debounce((value) => {
     setSearchQuery(value);
     setCurrentPage(1);
   }, 300), []);
 
-  // Filtered & searched orders
+  
   const filteredOrders = useMemo(() => {
     return orders
       .filter(o => statusFilter === "All" || o.status.toLowerCase() === statusFilter.toLowerCase())
       .filter(o => !searchQuery || o.user_name.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [orders, statusFilter, searchQuery]);
 
-  // Pagination
+
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentOrders = useMemo(() => filteredOrders.slice(indexOfFirst, indexOfLast), [filteredOrders, indexOfFirst, indexOfLast]);
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
-  // Excel export
+
   const handleExportExcel = useCallback(() => {
     const data = filteredOrders.map(o => ({
       Name: o.user_name,
@@ -157,7 +157,7 @@ export default function Orders() {
     XLSX.writeFile(wb, "orders_report.xlsx");
   }, [filteredOrders]);
 
-  // PDF export
+  
   const handleExportPDF = useCallback(() => {
     const doc = new jsPDF();
     doc.setFontSize(14);
@@ -241,14 +241,14 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Orders Grid */}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-4">
         {currentOrders.map(order => (
           <OrderCard key={order.id} order={order} onStatusChange={handleStatusChange} />
         ))}
       </div>
 
-      {/* Desktop Table */}
+
       <div className="hidden lg:block overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
         <table className="min-w-full text-sm lg:text-base border-collapse">
           <thead className="bg-blue-700 text-white">
@@ -269,12 +269,13 @@ export default function Orders() {
                   {order.items.map(i => (
                     <div key={i.id} className="flex items-center gap-2 mb-1">
                       {i.image_url ? (
-                        <img
-                          src={i.image_url.startsWith("http") ? i.image_url : `${API_URL}${i.image_url}`}
-                          alt={i.product_name}
-                          className="w-10 h-10 object-cover rounded-md flex-shrink-0"
-                          loading="lazy"
-                        />
+                      <img
+                        src={i.image_url.startsWith("http") ? i.image_url : `${API_URL}${i.image_url}`}
+                        alt={i.product_name}
+                        className="w-10 h-10 object-cover rounded-md flex-shrink-0"
+                        loading="lazy"
+                        decoding="async"
+                      />
                       ) : (
                         <div className="w-10 h-10 bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic rounded-md flex-shrink-0">No Img</div>
                       )}
@@ -302,7 +303,7 @@ export default function Orders() {
         </table>
       </div>
 
-      {/* Pagination */}
+
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
         <div className="flex items-center gap-2">
           <span className="text-gray-600 text-sm">Show:</span>

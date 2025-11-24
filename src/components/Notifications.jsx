@@ -4,7 +4,6 @@ import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 const NOTIFICATIONS_API = `${API_URL}/notifications`; 
 
-/* small inline icons to avoid importing an icon lib */
 const IconBell = ({ className = "", ...props }) => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
     <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 1 0-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" />
@@ -27,7 +26,6 @@ const IconTrash = ({ className = "", ...props }) => (
   </svg>
 );
 
-/* NotificationItem: memoized and receives stable callbacks */
 const NotificationItem = React.memo(({ n, markAsRead, deleteNotification }) => {
   return (
     <li
@@ -38,7 +36,7 @@ const NotificationItem = React.memo(({ n, markAsRead, deleteNotification }) => {
     >
       {n.image_url ? (
         <img
-          src={`${API_URL}${n.image_url}`}
+          src={n.image_url.startsWith("http") ? n.image_url : `${API_URL}${n.image_url}`}
           alt={n.product_name || "Notification"}
           width={48}
           height={48}
@@ -106,7 +104,7 @@ export default function Notifications() {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await axios.get(NOTIFICATIONS_API); // ✅ use constant
+      const res = await axios.get(NOTIFICATIONS_API);
       setNotifications(res.data || []);
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -160,7 +158,7 @@ export default function Notifications() {
 
   const markAsRead = useCallback(async (id) => {
     try {
-      await axios.put(`${NOTIFICATIONS_API}/${id}/read`); // ✅ use constant
+      await axios.put(`${NOTIFICATIONS_API}/${id}/read`);
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
     } catch (err) {
       console.error("markAsRead error:", err);
@@ -173,7 +171,7 @@ export default function Notifications() {
       const BATCH = 10;
       for (let i = 0; i < unread.length; i += BATCH) {
         const batch = unread.slice(i, i + BATCH);
-        await Promise.all(batch.map((id) => axios.put(`${NOTIFICATIONS_API}/${id}/read`))); // ✅ use constant
+        await Promise.all(batch.map((id) => axios.put(`${NOTIFICATIONS_API}/${id}/read`)));
       }
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {
@@ -183,7 +181,7 @@ export default function Notifications() {
 
   const deleteNotification = useCallback(async (id) => {
     try {
-      await axios.delete(`${NOTIFICATIONS_API}/${id}`); // ✅ use constant
+      await axios.delete(`${NOTIFICATIONS_API}/${id}`);
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
       console.error("deleteNotification error:", err);

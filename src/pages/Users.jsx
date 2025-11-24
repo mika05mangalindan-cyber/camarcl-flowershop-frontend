@@ -3,7 +3,6 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 const API_URL = process.env.REACT_APP_API_URL;
 const USERS_API = `${API_URL}/users`;
 
-/* ---------- Tiny inline icons ---------- */
 const IconUser = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M12 12a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -27,7 +26,7 @@ const IconTrash = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-// Desktop table ---------- 
+
 const UserRow = React.memo(({ user, onEdit, onDelete }) => {
   const roleColor = useMemo(
     () => (user.role === "admin" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"),
@@ -65,7 +64,7 @@ const UserRow = React.memo(({ user, onEdit, onDelete }) => {
   );
 });
 
-// Mobile/tablet ---------- 
+
 const UserCard = React.memo(({ user, onEdit, onDelete }) => {
   const roleColor = useMemo(
     () => (user.role === "admin" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"),
@@ -101,7 +100,7 @@ const UserCard = React.memo(({ user, onEdit, onDelete }) => {
   );
 });
 
-// Skeleton ----------
+
 const Skeleton = () => (
   <div className="animate-pulse p-4 space-y-2">
     <div className="h-6 bg-gray-200 rounded w-3/4" />
@@ -110,7 +109,7 @@ const Skeleton = () => (
   </div>
 );
 
-// Component ---------- 
+
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", contact_number: "", role: "customer", password: "" });
@@ -120,7 +119,7 @@ export default function Users() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Fetch Users ----------
+
   useEffect(() => {
     const ac = new AbortController();
     const loadUsers = async () => {
@@ -140,7 +139,7 @@ export default function Users() {
     return () => ac.abort();
   }, []);
 
-  // Form Handlers ----------
+
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
@@ -206,7 +205,7 @@ export default function Users() {
     }
   }, [form, editingId]);
 
-  //Filtering & Pagination ---------
+
   const filteredUsers = useMemo(() =>
     filterRole === "all" ? users : users.filter((u) => u.role === filterRole),
     [users, filterRole]
@@ -227,7 +226,7 @@ export default function Users() {
     <main className="p-4 sm:p-6 max-w-5xl mx-auto">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Users Management</h1>
 
-      {/* ---------- Form ---------- */}
+     
       <form onSubmit={handleSubmit} className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label htmlFor="name" className="sr-only">Full Name</label>
         <input id="name" name="name" value={form.name} onChange={handleChange} placeholder="Full Name" className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none w-full" required />
@@ -252,7 +251,7 @@ export default function Users() {
         </button>
       </form>
 
-      {/* ---------- Filter ---------- */}
+     
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <span className="text-lg font-medium text-gray-700">Users</span>
         <div className="flex items-center gap-2">
@@ -265,14 +264,14 @@ export default function Users() {
         </div>
       </div>
 
-      {/* ---------- Users List ---------- */}
+     
       {loading ? (
         <Skeleton />
       ) : filteredUsers.length === 0 ? (
         <p className="p-6 text-center text-gray-500">No users found.</p>
       ) : (
         <>
-          {/* Desktop Table */}
+        
           <div className="hidden lg:block overflow-x-auto rounded-2xl">
             <table className="w-full table-auto border-collapse">
               <thead className="bg-blue-600 text-white">
@@ -291,7 +290,7 @@ export default function Users() {
             </table>
           </div>
 
-          {/* Mobile/Tablet Cards */}
+        
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden p-2">
             {currentUsers.map((user) => (
               <UserCard key={user.id} user={user} onEdit={handleEdit} onDelete={handleDelete} />
@@ -300,7 +299,7 @@ export default function Users() {
         </>
       )}
 
-      {/* ---------- Pagination ---------- */}
+  
       <nav className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6" aria-label="Pagination">
         <div className="flex items-center gap-2">
           <label className="text-gray-600 text-sm">Show:</label>

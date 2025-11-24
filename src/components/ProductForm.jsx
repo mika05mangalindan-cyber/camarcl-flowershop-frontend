@@ -75,13 +75,14 @@ export default function ProductForm({ onSubmit, initialData = {}, editMode = fal
       
       {previewUrl && (
         <img
-          src={previewUrl}
+          src={previewUrl.startsWith("http") ? previewUrl : URL.createObjectURL(previewUrl)}
           alt="Product preview"
           width={96}
           height={96}
           className="object-contain w-24 h-24 rounded-md mb-2"
         />
       )}
+
       
       <input type="file" name="image" onChange={handleChange} accept="image/*" className="p-2 border rounded-md focus:ring-2 focus:ring-blue-300 outline-none w-full" />
       

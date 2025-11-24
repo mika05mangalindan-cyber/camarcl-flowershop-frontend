@@ -2,7 +2,6 @@ import React, { memo, Suspense, lazy } from "react";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-// Lazy load icons
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 const FiTrash2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiTrash2 })));
 
@@ -10,15 +9,15 @@ const ProductCard = memo(({ product, onEdit, onDelete }) => (
   <div className="bg-white shadow-sm rounded-xl p-3 flex hover:bg-blue-50 transition-transform transform hover:scale-[1.02] duration-150">
     <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-md mr-3 bg-gray-50">
       {product.image_url ? (
-        <img
-          src={product.image_url}
-          alt={product.name}
-          width={80}
-          height={80}
-          className="object-contain w-full h-full"
-          loading="lazy"
-          decoding="async"
-        />
+                  <img
+                    src={product.image_url.startsWith("http") ? product.image_url : `${API_URL}${product.image_url}`}
+                    alt={product.name}
+                    width={80}
+                    height={80}
+                    className="object-contain w-full h-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
       ) : (
         <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs italic">
           No Image
