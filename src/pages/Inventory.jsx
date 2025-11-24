@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import InventoryTable from "../components/InventoryCard";
+import InventoryCard from "../components/InventoryCard";
+
 
 const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
