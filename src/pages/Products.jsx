@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, memo, lazy, Suspense, useMemo } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import ProductForm from "./ProductForm";
+import ProductForm from "../components/ProductForm";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
