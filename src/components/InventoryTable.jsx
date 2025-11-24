@@ -17,7 +17,7 @@ export default function InventoryTable({ products, onEdit, onDelete }) {
             <th className="p-3 text-left">Category</th>
             <th className="p-3 text-left">Price</th>
             <th className="p-3 text-left">Stock</th>
-            <th className="p-3 text-left">Actions</th>
+            
           </tr>
         </thead>
         <tbody>
