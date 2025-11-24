@@ -5,6 +5,7 @@ import ProductForm from "../components/ProductForm";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
+
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 const FiTrash2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiTrash2 })));
 
