@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import InventoryCard from "../components/InventoryCard";
+import InventoryTable from "../components/InventoryTable";
 
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -171,9 +172,9 @@ export default function Inventory() {
 
 
 
-      {/* <div className="hidden md:block">
+      <div className="hidden md:block">
         <InventoryTable products={currentProducts} />
-      </div> */}
+      </div>
 
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
