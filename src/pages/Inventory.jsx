@@ -5,6 +5,7 @@ import ProductCard from "../components/ProductCard";
 import ProductTable from "../components/ProductTable";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const PRODUCTS_API = `${API_URL}/products`;
 
 export default function Inventory() {
   const [products, setProducts] = useState([]);
@@ -20,7 +21,7 @@ export default function Inventory() {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}`/products``);
+      const res = await axios.get(PRODUCTS_API);
       setProducts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -34,54 +35,47 @@ export default function Inventory() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Unique categories
-  const categories = useMemo(
-    () => ["All", ...new Set((products || []).map(p => p?.category).filter(Boolean))],
-    [products]
-  );
+  // Unique categories for filter
+  const categories = useMemo(() => ["All", ...new Set(products.map(p => p.category).filter(Boolean))], [products]);
 
   // Debounced search
-  const handleSearchChange = useMemo(
-    () =>
-      debounce(value => {
-        setSearchQuery(value.toLowerCase());
-        setCurrentPage(1);
-      }, 300),
-    []
-  );
+  const handleSearchChange = useMemo(() => debounce(value => {
+    setSearchQuery(value.toLowerCase());
+    setCurrentPage(1);
+  }, 300), []);
 
   useEffect(() => {
     return () => handleSearchChange.cancel();
   }, [handleSearchChange]);
 
-  // Filter, sort, search
+  // Filter, search, and sort products
   const filteredProducts = useMemo(() => {
-    let updated = [...(products || [])];
+    let result = [...products];
 
-    if (categoryFilter !== "All") updated = updated.filter(p => p?.category === categoryFilter);
-    if (searchQuery.trim()) updated = updated.filter(p => p?.name?.toLowerCase().includes(searchQuery));
+    if (categoryFilter !== "All") result = result.filter(p => p.category === categoryFilter);
+    if (searchQuery.trim()) result = result.filter(p => p.name.toLowerCase().includes(searchQuery));
 
-    if (sortOrder === "Low to High") updated.sort((a, b) => (a?.stock ?? 0) - (b?.stock ?? 0));
-    else if (sortOrder === "High to Low") updated.sort((a, b) => (b?.stock ?? 0) - (a?.stock ?? 0));
+    if (sortOrder === "Low to High") result.sort((a, b) => (a.stock ?? 0) - (b.stock ?? 0));
+    else if (sortOrder === "High to Low") result.sort((a, b) => (b.stock ?? 0) - (a.stock ?? 0));
 
-    return updated;
+    return result;
   }, [products, categoryFilter, sortOrder, searchQuery]);
 
   // Pagination
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentProducts = (filteredProducts || []).slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil((filteredProducts || []).length / itemsPerPage);
+  const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   // Export to Excel
   const exportToExcel = useCallback(async () => {
     const XLSX = await import("xlsx");
     const now = new Date().toLocaleString();
-    const data = (filteredProducts || []).map(p => ({
+    const data = filteredProducts.map(p => ({
       Date: now,
-      Name: p?.name || "-",
-      Category: p?.category || "-",
-      Stock: p?.stock ?? 0,
+      Name: p.name || "-",
+      Category: p.category || "-",
+      Stock: p.stock ?? 0,
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -102,11 +96,11 @@ export default function Inventory() {
     doc.setFontSize(10);
     doc.text(`Generated: ${date}`, 10, 22);
 
-    const tableData = (filteredProducts || []).map(p => [
-      p?.name || "-",
-      p?.category || "-",
-      `PHP ${Number(p?.price ?? 0).toLocaleString()}.00`,
-      p?.stock ?? 0,
+    const tableData = filteredProducts.map(p => [
+      p.name || "-",
+      p.category || "-",
+      `PHP ${Number(p.price ?? 0).toLocaleString()}.00`,
+      p.stock ?? 0,
     ]);
 
     autoTable(doc, {
@@ -130,17 +124,19 @@ export default function Inventory() {
 
   return (
     <main className="p-4 sm:p-6 space-y-6">
-      {/* Header */}
+      {/* Header + Filters + Search + Export */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-wrap">
         <h1 className="text-2xl font-semibold text-gray-800">Inventory</h1>
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Filters */}
+          {/* Category Filter */}
           <div className="flex items-center gap-2">
             <label htmlFor="categoryFilter" className="text-gray-600 text-sm font-medium">Filter:</label>
             <select id="categoryFilter" value={categoryFilter} onChange={e => { setCategoryFilter(e.target.value); setCurrentPage(1); }} className="p-2 border rounded-md text-sm">
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
+
+          {/* Sort */}
           <div className="flex items-center gap-2">
             <label htmlFor="sortOrder" className="text-gray-600 text-sm font-medium">Sort:</label>
             <select id="sortOrder" value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="p-2 border rounded-md text-sm">
@@ -149,11 +145,15 @@ export default function Inventory() {
               <option value="High to Low">High to Low</option>
             </select>
           </div>
+
+          {/* Search */}
           <div className="flex items-center gap-2">
-            <input type="text" aria-label="Search products" placeholder="Search product..." onChange={e => handleSearchChange(e.target.value)} className="p-2 border rounded-md text-sm" />
+            <input type="text" placeholder="Search product..." onChange={e => handleSearchChange(e.target.value)} className="p-2 border rounded-md text-sm" />
           </div>
+
+          {/* Export Menu */}
           <div className="relative">
-            <button aria-label="Generate report" onClick={() => setShowExportMenu(prev => !prev)} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium">Generate Report</button>
+            <button onClick={() => setShowExportMenu(prev => !prev)} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium">Generate Report</button>
             {showExportMenu && (
               <div className="absolute right-0 mt-1 w-32 bg-white border rounded shadow-lg z-10">
                 <button onClick={exportToExcel} className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm">Excel</button>
@@ -164,9 +164,9 @@ export default function Inventory() {
         </div>
       </div>
 
-      {/* Mobile */}
+      {/* Mobile Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:hidden gap-4">
-        {(currentProducts || []).map(p => <ProductCard key={p?.id} product={p} />)}
+        {currentProducts.map(p => <ProductCard key={p.id} product={p} />)}
       </div>
 
       {/* Desktop Table */}

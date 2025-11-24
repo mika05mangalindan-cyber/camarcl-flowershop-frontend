@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const ORDERS_API = `${API_URL}/orders`;
 
 // Helper: status color
 const getStatusColor = (status) => {
@@ -17,12 +18,12 @@ const getStatusColor = (status) => {
   }
 };
 
-// Memoized Mobile Order Card
+// Mobile Order Card
 const OrderCard = memo(({ order, onStatusChange }) => (
   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 hover:bg-blue-50 transition-transform duration-200">
     <h2 className="font-semibold text-lg mb-3">{order.user_name}</h2>
 
-    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
       {order.items.map(item => (
         <div key={item.id} className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg">
           {item.image_url ? (
@@ -49,9 +50,7 @@ const OrderCard = memo(({ order, onStatusChange }) => (
       <span className="font-semibold text-red-500 text-sm">
         Total: PHP {Number(order.total).toLocaleString()}.00
       </span>
-      <span className="font-semibold text-sm">
-        Payment: {order.payment_mode}
-      </span>
+      <span className="font-semibold text-sm">Payment: {order.payment_mode}</span>
     </div>
 
     <select
@@ -79,7 +78,7 @@ export default function Orders() {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/orders`);
+      const res = await axios.get(ORDERS_API); // ✅ use ORDERS_API
 
       const groupedOrders = res.data.reduce((acc, row) => {
         let order = acc.find(o => o.id === row.order_id);
@@ -118,10 +117,10 @@ export default function Orders() {
   // Status update
   const handleStatusChange = useCallback(async (orderId, newStatus) => {
     try {
-      await axios.put(`${API_URL}/orders/${orderId}/status`, { status: newStatus });
-      fetchOrders();
+      await axios.put(`${ORDERS_API}/${orderId}/status`, { status: newStatus }); // ✅ use ORDERS_API
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     } catch (err) { console.error(err); }
-  }, [fetchOrders]);
+  }, []);
 
   // Debounced search
   const handleSearchChange = useMemo(() => debounce((value) => {
@@ -173,7 +172,7 @@ export default function Orders() {
       `PHP ${Number(o.total).toLocaleString()}.00`,
       o.payment_mode,
       new Date(o.created_at).toLocaleDateString(),
-      { content: o.status, styles: { textColor: getStatusColor(o.status) === "text-green-600" ? [0,128,0] : getStatusColor(o.status) === "text-yellow-600" ? [255,165,0] : getStatusColor(o.status) === "text-red-600" ? [255,0,0] : [0,0,0] } },
+      o.status,
     ]);
 
     autoTable(doc, {
@@ -188,7 +187,6 @@ export default function Orders() {
     doc.save("orders_report.pdf");
   }, [filteredOrders]);
 
-  // Skeleton loader
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
@@ -243,7 +241,7 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Responsive Orders Grid */}
+      {/* Orders Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-4">
         {currentOrders.map(order => (
           <OrderCard key={order.id} order={order} onStatusChange={handleStatusChange} />

@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback, Suspense } from "react";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
-// Lazy-load heavy libraries and components
-const XLSX = React.lazy(() => import("xlsx"));
-const jsPDF = React.lazy(() => import("jspdf"));
-const autoTable = React.lazy(() => import("jspdf-autotable"));
+// Lazy-load components
 const BarChartWrapper = React.lazy(() => import("../components/BarChartWrapper"));
 const OrderCard = React.lazy(() => import("../components/OrderCard"));
 
@@ -19,21 +16,20 @@ export default function Dashboard() {
   const [salesMonthFilter, setSalesMonthFilter] = useState("current");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const categoryColors = useMemo(() => [
-    "#22C55E","#3B82F6","#FACC15","#EF4444","#8B5CF6","#F97316","#06B6D4",
-  ], []);
+  const categoryColors = useMemo(
+    () => ["#22C55E","#3B82F6","#FACC15","#EF4444","#8B5CF6","#F97316","#06B6D4"],
+    []
+  );
 
-  // Filtered recent orders based on search
   const filteredOrders = useMemo(() => {
     if (!searchQuery.trim()) return recentOrders;
-    const query = searchQuery.toLowerCase();
-    return recentOrders.filter(order =>
-      order.user_name.toLowerCase().includes(query) ||
-      order.items.some(item => item.product_name.toLowerCase().includes(query))
+    const q = searchQuery.toLowerCase();
+    return recentOrders.filter(
+      o => o.user_name.toLowerCase().includes(q) ||
+           o.items.some(i => i.product_name.toLowerCase().includes(q))
     );
   }, [recentOrders, searchQuery]);
 
-  // Fetch dashboard data
   useEffect(() => {
     let mounted = true;
 
@@ -41,12 +37,13 @@ export default function Dashboard() {
       try {
         const [ordersRes, usersRes] = await Promise.all([
           axios.get(`${API_URL}/orders`),
-          axios.get(`${API_URL}/users`),
+          axios.get(`${API_URL}/users`)
         ]);
         if (!mounted) return;
 
         const orders = ordersRes.data;
         const users = usersRes.data;
+
         const now = new Date();
         const currentMonth = now.getMonth() + 1;
         const currentYear = now.getFullYear();
@@ -61,7 +58,6 @@ export default function Dashboard() {
         const ordersThisMonth = deliveredThisMonth.length;
         const revenueThisMonth = deliveredThisMonth.reduce((sum, o) => sum + (parseFloat(o.item_total) || 0), 0);
 
-        // Most sold product
         const productCounts = {};
         deliveredThisMonth.forEach(o => {
           productCounts[o.product_name] = (productCounts[o.product_name] || 0) + o.quantity;
@@ -70,7 +66,7 @@ export default function Dashboard() {
 
         setStats({
           totalOrders: deliveredOrders.length,
-          totalRevenue: deliveredOrders.reduce((sum, o) => sum + (parseFloat(o.item_total) || 0), 0),
+          totalRevenue: deliveredOrders.reduce((sum,o) => sum + (parseFloat(o.item_total)||0),0),
           totalProducts: new Set(orders.map(o=>o.product_id)).size,
           totalUsers: users.length,
           ordersThisMonth,
@@ -79,7 +75,7 @@ export default function Dashboard() {
           currentMonthName,
         });
 
-        // Group recent orders
+        // Group orders
         const groupedOrders = {};
         orders.forEach(o => {
           if (!groupedOrders[o.order_id]) groupedOrders[o.order_id] = { ...o, items: [] };
@@ -93,11 +89,11 @@ export default function Dashboard() {
         });
 
         setRecentOrders(Object.values(groupedOrders)
-          .sort((a,b)=> new Date(b.created_at.replace(" ","T")) - new Date(a.created_at.replace(" ","T")))
+          .sort((a,b)=>new Date(b.created_at.replace(" ","T")) - new Date(a.created_at.replace(" ","T")))
           .slice(0,5)
         );
 
-        // Sales data based on filter
+        // Sales data
         const applySalesFilter = () => {
           let filtered = deliveredOrders;
           if (salesMonthFilter !== "all") {
@@ -114,10 +110,10 @@ export default function Dashboard() {
             const cat = o.category || o.product_name;
             salesMap[cat] = (salesMap[cat] || 0) + (parseFloat(o.item_total) || 0);
           });
-          setSalesData(Object.entries(salesMap).map(([category,total]) => ({ category, total })));
+          setSalesData(Object.entries(salesMap).map(([category,total])=>({category,total})));
         };
-        applySalesFilter();
 
+        applySalesFilter();
         setLoading(false);
       } catch(err){
         console.error("Dashboard fetch error:", err);
@@ -129,7 +125,6 @@ export default function Dashboard() {
     return () => mounted = false;
   }, [salesMonthFilter]);
 
-  // Export report
   const exportReport = useCallback(async (format) => {
     const now = new Date().toLocaleString();
     const reportTitle = "Sales Report";
@@ -138,7 +133,7 @@ export default function Dashboard() {
       ? stats.totalRevenue
       : salesMonthFilter === "current"
         ? stats.revenueThisMonth
-        : salesData.reduce((sum,item)=>sum+item.total,0);
+        : salesData.reduce((sum,i)=>sum+i.total,0);
 
     const reportSubtitle = salesMonthFilter === "current"
       ? `Revenue for ${stats.currentMonthName}: PHP ${Number(stats.revenueThisMonth).toLocaleString()}.00`
@@ -150,30 +145,30 @@ export default function Dashboard() {
             return `Revenue for ${monthName} ${year}: PHP ${Number(revenue).toLocaleString()}.00`;
           })();
 
-    const data = salesData.map(d => ({ Category: d.category, Sales: d.total }));
+    const data = salesData.map(d => ({ Category:d.category, Sales:d.total }));
 
-    if (format === "excel") {
+    if(format === "excel"){
       const XLSX = (await import("xlsx")).default;
       const ws = XLSX.utils.json_to_sheet(data);
       XLSX.utils.sheet_add_aoa(ws, [
         [reportSubtitle],
         [`Most Sold Product`, stats.mostSoldProduct],
         [],
-      ], { origin: "A1" });
+      ], { origin:"A1" });
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "SalesReport");
       XLSX.writeFile(wb, `Sales_Report_${now.replace(/[:\/, ]/g,"_")}.xlsx`);
-    } else if (format === "pdf") {
+    } else if(format === "pdf"){
       const { jsPDF } = await import("jspdf");
       const autoTable = (await import("jspdf-autotable")).default;
       const doc = new jsPDF();
-      doc.setFontSize(18); doc.setTextColor("#1E40AF"); doc.text(`${reportTitle} - ${now}`, 14, 20);
-      doc.setFontSize(12); doc.setTextColor("#111827"); doc.text(reportSubtitle, 14, 30);
-      doc.text(`Most Sold Product: ${stats.mostSoldProduct}`, 14, 37);
-      autoTable(doc, {
-        startY: 45,
+      doc.setFontSize(18); doc.setTextColor("#1E40AF"); doc.text(`${reportTitle} - ${now}`,14,20);
+      doc.setFontSize(12); doc.setTextColor("#111827"); doc.text(reportSubtitle,14,30);
+      doc.text(`Most Sold Product: ${stats.mostSoldProduct}`,14,37);
+      autoTable(doc,{
+        startY:45,
         head:[["Category","Sales (PHP)"]],
-        body: data.map(d=>[d.Category,`PHP ${Number(d.Sales).toLocaleString()}.00`]),
+        body:data.map(d=>[d.Category,`PHP ${Number(d.Sales).toLocaleString()}.00`]),
         headStyles:{fillColor:"#3B82F6", textColor:"#fff", fontStyle:"bold"},
         bodyStyles:{fontSize:11,cellPadding:3},
         theme:"grid"
@@ -237,7 +232,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Orders with Search */}
+      {/* Recent Orders */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <h2 className="text-lg font-semibold text-gray-800">Recent Orders</h2>
@@ -245,16 +240,10 @@ export default function Dashboard() {
             <input
               type="text"
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={e=>setSearchQuery(e.target.value)}
               placeholder="Search orders..."
               className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-200 bg-white"
             />
-            {/* <button
-              onClick={() => setSearchQuery("")}
-              className="px-3 py-1 bg-gray-200 rounded-md text-sm hover:bg-gray-300"
-            >
-              
-            </button> */}
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const USERS_API_URL = `${API_URL}/users`;
+const USERS_API = `${API_URL}/users`;
 
 /* ---------- Tiny inline icons ---------- */
 const IconUser = ({ className = "w-5 h-5" }) => (
@@ -27,7 +27,7 @@ const IconTrash = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-/* ---------- UserRow (desktop table) ---------- */
+// Desktop table ---------- 
 const UserRow = React.memo(({ user, onEdit, onDelete }) => {
   const roleColor = useMemo(
     () => (user.role === "admin" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"),
@@ -65,7 +65,7 @@ const UserRow = React.memo(({ user, onEdit, onDelete }) => {
   );
 });
 
-/* ---------- UserCard (mobile/tablet) ---------- */
+// Mobile/tablet ---------- 
 const UserCard = React.memo(({ user, onEdit, onDelete }) => {
   const roleColor = useMemo(
     () => (user.role === "admin" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"),
@@ -101,7 +101,7 @@ const UserCard = React.memo(({ user, onEdit, onDelete }) => {
   );
 });
 
-/* ---------- Skeleton ---------- */
+// Skeleton ----------
 const Skeleton = () => (
   <div className="animate-pulse p-4 space-y-2">
     <div className="h-6 bg-gray-200 rounded w-3/4" />
@@ -110,7 +110,7 @@ const Skeleton = () => (
   </div>
 );
 
-/* ---------- Main Component ---------- */
+// Component ---------- 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", contact_number: "", role: "customer", password: "" });
@@ -120,13 +120,13 @@ export default function Users() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  /* ---------- Fetch Users ---------- */
+  // Fetch Users ----------
   useEffect(() => {
     const ac = new AbortController();
     const loadUsers = async () => {
       setLoading(true);
       try {
-        const res = await fetch(API_URL, { signal: ac.signal });
+        const res = await fetch(USERS_API, { signal: ac.signal });
         if (!res.ok) throw new Error("Failed to fetch users");
         const data = await res.json();
         setUsers(data || []);
@@ -140,7 +140,7 @@ export default function Users() {
     return () => ac.abort();
   }, []);
 
-  /* ---------- Form Handlers ---------- */
+  // Form Handlers ----------
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
@@ -154,8 +154,8 @@ export default function Users() {
   const handleDelete = useCallback(async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      setUsers((prev) => prev.filter((u) => u.id !== id)); // optimistic update
-      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      const res = await fetch(`${USERS_API}/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
     } catch (err) {
       console.error(err);
@@ -169,16 +169,30 @@ export default function Users() {
       return;
     }
 
-    const payload = { name: form.name, email: form.email, contact_number: form.contact_number, role: form.role, ...(form.password ? { password: form.password } : {}) };
+    const payload = {
+      name: form.name,
+      email: form.email,
+      contact_number: form.contact_number,
+      role: form.role,
+      ...(form.password ? { password: form.password } : {})
+    };
 
     try {
       if (editingId) {
-        const res = await fetch(`${API_URL}/${editingId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const res = await fetch(`${USERS_API}/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
         if (!res.ok) throw new Error("Update failed");
         const updated = await res.json();
         setUsers((prev) => prev.map((u) => (u.id === editingId ? updated : u)));
       } else {
-        const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const res = await fetch(USERS_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
         if (!res.ok) throw new Error("Create failed");
         const created = await res.json();
         setUsers((prev) => [created, ...prev]);
@@ -192,8 +206,12 @@ export default function Users() {
     }
   }, [form, editingId]);
 
-  /* ---------- Pagination & Filtering ---------- */
-  const filteredUsers = useMemo(() => filterRole === "all" ? users : users.filter((u) => u.role === filterRole), [users, filterRole]);
+  //Filtering & Pagination ---------
+  const filteredUsers = useMemo(() =>
+    filterRole === "all" ? users : users.filter((u) => u.role === filterRole),
+    [users, filterRole]
+  );
+
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage));
 
   const currentUsers = useMemo(() => {
@@ -229,7 +247,9 @@ export default function Users() {
         <label htmlFor="password" className="sr-only">Password</label>
         <input id="password" name="password" type="password" value={form.password} onChange={handleChange} placeholder={editingId ? "Leave blank to keep current password" : "Password"} className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none w-full col-span-1 sm:col-span-2" required={!editingId} />
 
-        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-md transition-colors col-span-1 sm:col-span-2">{editingId ? "Update User" : "Add User"}</button>
+        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-md transition-colors col-span-1 sm:col-span-2">
+          {editingId ? "Update User" : "Add User"}
+        </button>
       </form>
 
       {/* ---------- Filter ---------- */}
@@ -246,28 +266,36 @@ export default function Users() {
       </div>
 
       {/* ---------- Users List ---------- */}
-      {loading ? <Skeleton /> : filteredUsers.length === 0 ? <p className="p-6 text-center text-gray-500">No users found.</p> : (
+      {loading ? (
+        <Skeleton />
+      ) : filteredUsers.length === 0 ? (
+        <p className="p-6 text-center text-gray-500">No users found.</p>
+      ) : (
         <>
           {/* Desktop Table */}
           <div className="hidden lg:block overflow-x-auto rounded-2xl">
             <table className="w-full table-auto border-collapse">
               <thead className="bg-blue-600 text-white">
                 <tr>
-                  <th className="p-3 text-left font-medium" scope="col">Name</th>
-                  <th className="p-3 text-left font-medium" scope="col">Email</th>
-                  <th className="p-3 text-left font-medium" scope="col">Contact</th>
-                  <th className="p-3 text-left font-medium" scope="col">Actions</th>
+                  <th className="p-3 text-left font-medium">Name</th>
+                  <th className="p-3 text-left font-medium">Email</th>
+                  <th className="p-3 text-left font-medium">Contact</th>
+                  <th className="p-3 text-left font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {currentUsers.map((user) => <UserRow key={user.id} user={user} onEdit={handleEdit} onDelete={handleDelete} />)}
+                {currentUsers.map((user) => (
+                  <UserRow key={user.id} user={user} onEdit={handleEdit} onDelete={handleDelete} />
+                ))}
               </tbody>
             </table>
           </div>
 
           {/* Mobile/Tablet Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden p-2">
-            {currentUsers.map((user) => <UserCard key={user.id} user={user} onEdit={handleEdit} onDelete={handleDelete} />)}
+            {currentUsers.map((user) => (
+              <UserCard key={user.id} user={user} onEdit={handleEdit} onDelete={handleDelete} />
+            ))}
           </div>
         </>
       )}
@@ -276,7 +304,14 @@ export default function Users() {
       <nav className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6" aria-label="Pagination">
         <div className="flex items-center gap-2">
           <label className="text-gray-600 text-sm">Show:</label>
-          <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="border px-3 py-1 rounded-md focus:ring-2 focus:ring-blue-400 outline-none">
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="border px-3 py-1 rounded-md focus:ring-2 focus:ring-blue-400 outline-none"
+          >
             <option value="10">10</option>
             <option value="15">15</option>
             <option value="20">20</option>
@@ -285,9 +320,33 @@ export default function Users() {
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} className={`px-4 py-2 rounded-md text-white ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`} type="button">Previous</button>
-          <span className="text-gray-700 font-medium">Page {currentPage} of {totalPages}</span>
-          <button disabled={currentPage === totalPages || totalPages === 0} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} className={`px-4 py-2 rounded-md text-white ${currentPage === totalPages || totalPages === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`} type="button">Next</button>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            className={`px-4 py-2 rounded-md text-white ${
+              currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            type="button"
+          >
+            Previous
+          </button>
+
+          <span className="text-gray-700 font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            disabled={currentPage === totalPages || totalPages === 0}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            className={`px-4 py-2 rounded-md text-white ${
+              currentPage === totalPages || totalPages === 0
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            type="button"
+          >
+            Next
+          </button>
         </div>
       </nav>
     </main>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
+const NOTIFICATIONS_API = `${API_URL}/notifications`; // ✅ added
 
 /* small inline icons to avoid importing an icon lib */
 const IconBell = ({ className = "", ...props }) => (
@@ -91,7 +91,6 @@ export default function Notifications() {
 
   // audio init once
   useEffect(() => {
-    // keep this lazy and minimal
     audioRef.current = new Audio("/notification.mp3");
     audioRef.current.preload = "auto";
   }, []);
@@ -101,28 +100,22 @@ export default function Notifications() {
     if (!a) return;
     try {
       a.currentTime = 0;
-      a.play().catch(() => {
-        /* ignore autoplay errors */
-      });
-    } catch (e) {
-      /* ignore */
-    }
+      a.play().catch(() => {});
+    } catch (e) {}
   }, []);
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/notifications`);
+      const res = await axios.get(NOTIFICATIONS_API); // ✅ use constant
       setNotifications(res.data || []);
     } catch (err) {
       console.error("Error fetching notifications:", err);
     }
   }, []);
 
-  // connect socket only when component mounts
   useEffect(() => {
     let mounted = true;
 
-    // dynamic import so socket client code doesn't inflate initial bundle
     (async () => {
       try {
         const mod = await import("socket.io-client");
@@ -130,13 +123,9 @@ export default function Notifications() {
         const s = io(`${API_URL}`, { autoConnect: true });
         socketRef.current = s;
 
-        s.on("connect_error", (err) => {
-          // optional: report or retry logic
-          console.debug("socket connect error", err);
-        });
+        s.on("connect_error", (err) => console.debug("socket connect error", err));
 
         s.on("new_notification", (notif) => {
-          // prepend new notification, keep max reasonable size (e.g., 200)
           setNotifications((prev) => {
             const next = [notif, ...prev];
             return next.length > 200 ? next.slice(0, 200) : next;
@@ -148,7 +137,6 @@ export default function Notifications() {
       }
     })();
 
-    // initial fetch
     fetchNotifications();
 
     const handleClickOutside = (event) => {
@@ -160,8 +148,7 @@ export default function Notifications() {
 
     return () => {
       mounted = false;
-      // cleanup socket connection
-      if (socketRef.current && socketRef.current.disconnect) {
+      if (socketRef.current?.disconnect) {
         socketRef.current.disconnect();
         socketRef.current = null;
       }
@@ -171,27 +158,22 @@ export default function Notifications() {
 
   const unreadCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
 
-  // stable handlers
-  const markAsRead = useCallback(
-    async (id) => {
-      try {
-        await axios.put(`${API_URL}/notifications/${id}/read`);
-        setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
-      } catch (err) {
-        console.error("markAsRead error:", err);
-      }
-    },
-    []
-  );
+  const markAsRead = useCallback(async (id) => {
+    try {
+      await axios.put(`${NOTIFICATIONS_API}/${id}/read`); // ✅ use constant
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+    } catch (err) {
+      console.error("markAsRead error:", err);
+    }
+  }, []);
 
   const markAllAsRead = useCallback(async () => {
     try {
       const unread = notifications.filter((n) => !n.isRead).map((n) => n.id);
-      // small optimization: if server exposes a bulk endpoint, prefer that. Here we do Promise.all but limit concurrency if many.
       const BATCH = 10;
       for (let i = 0; i < unread.length; i += BATCH) {
         const batch = unread.slice(i, i + BATCH);
-        await Promise.all(batch.map((id) => axios.put(`${API_URL}/notifications/${id}/read`)));
+        await Promise.all(batch.map((id) => axios.put(`${NOTIFICATIONS_API}/${id}/read`))); // ✅ use constant
       }
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {
@@ -201,7 +183,7 @@ export default function Notifications() {
 
   const deleteNotification = useCallback(async (id) => {
     try {
-      await axios.delete(`${API_URL}/notifications/${id}`);
+      await axios.delete(`${NOTIFICATIONS_API}/${id}`); // ✅ use constant
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
       console.error("deleteNotification error:", err);
@@ -210,7 +192,6 @@ export default function Notifications() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell Icon */}
       <button
         onClick={() => setShowDropdown((prev) => !prev)}
         className="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
@@ -225,10 +206,8 @@ export default function Notifications() {
         )}
       </button>
 
-      {/* Dropdown */}
       {showDropdown && (
         <div className="absolute right-0 mt-2 w-80 max-w-full sm:w-96 bg-white shadow-lg rounded-lg overflow-hidden z-50 border">
-          {/* Header */}
           <div className="flex justify-between items-center p-3 border-b bg-gray-50">
             <span className="font-semibold text-gray-700 text-sm">Notifications</span>
             {unreadCount > 0 && (
@@ -243,7 +222,6 @@ export default function Notifications() {
             )}
           </div>
 
-          {/* Notification List */}
           {notifications.length === 0 ? (
             <div className="p-4 text-gray-500 text-sm text-center">No notifications</div>
           ) : (
