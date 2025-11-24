@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
-const NOTIFICATIONS_API = `${API_URL}/notifications`; // ✅ added
+const API_URL = process.env.REACT_APP_API_URL;
+const NOTIFICATIONS_API = `${API_URL}/notifications`; 
 
 /* small inline icons to avoid importing an icon lib */
 const IconBell = ({ className = "", ...props }) => (

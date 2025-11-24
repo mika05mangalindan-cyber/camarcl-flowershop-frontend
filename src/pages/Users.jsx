@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (process.env.REACT_APP_API_URL || "http://localhost:5000").replace(/\/$/, "");
 const USERS_API = `${API_URL}/users`;
 
 /* ---------- Tiny inline icons ---------- */

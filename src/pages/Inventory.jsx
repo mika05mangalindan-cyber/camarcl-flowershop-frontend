@@ -4,7 +4,7 @@ import debounce from "lodash.debounce";
 import ProductCard from "../components/ProductCard";
 import ProductTable from "../components/ProductTable";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_API = `${API_URL}/products`;
 
 export default function Inventory() {
