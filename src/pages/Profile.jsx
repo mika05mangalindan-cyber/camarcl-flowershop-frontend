@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { useState, Suspense, lazy } from "react";
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -8,35 +8,15 @@ const FiX = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiX 
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 
 export default function Profile() {
-  // Get stored user ID from localStorage
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const userId = storedUser.id;
 
   const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    contact_number: "",
+    name: storedUser.name || "",
+    email: storedUser.email || "",
+    contact_number: storedUser.contact_number || "",
   });
+
   const [editMode, setEditMode] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch logged-in user's info from backend
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/users/${userId}`, { withCredentials: true });
-        setProfile(res.data);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,9 +25,9 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      await axios.put(`${API_URL}/users/${userId}`, profile, { withCredentials: true });
+      await axios.put(`${API_URL}/users/${storedUser.id}`, profile, { withCredentials: true });
 
-      // Update localStorage so sidebar also updates
+      // Update localStorage
       localStorage.setItem("user", JSON.stringify({ ...storedUser, ...profile }));
 
       setEditMode(false);
@@ -57,14 +37,6 @@ export default function Profile() {
       alert("Failed to update profile.");
     }
   };
-
-  if (loading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500 text-lg">Loading profile...</p>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -95,7 +67,7 @@ export default function Profile() {
           </div>
 
           <Suspense fallback={<div>Loading buttons...</div>}>
-            <div className="flex flex-col gap-4 mt-4">
+            <div className="flex flex-wrap gap-4 mt-4">
               {editMode ? (
                 <>
                   <button
