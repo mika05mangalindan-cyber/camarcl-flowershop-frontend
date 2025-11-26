@@ -7,9 +7,9 @@ import Orders from "../pages/Orders.jsx";
 import Users from "../pages/Users.jsx"; 
 import Inventory from "../pages/Inventory.jsx";
 import Sidebar from "../layouts/Sidebar.jsx";
-import Notifications from "../components/Notifications.jsx";
 import Profile from "../pages/Profile";
 import AccountSettings from "../pages/AccountSettings";
+import Login from "../pages/Login.jsx";
 
 const AdminRoutes = () => {
   return (
@@ -27,6 +27,7 @@ const AdminRoutes = () => {
             <Route path="users" element={<Users />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="*" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
           </Routes>
         </main>
       </div>

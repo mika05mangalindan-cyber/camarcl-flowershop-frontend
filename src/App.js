@@ -7,7 +7,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to /dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/Login" replace />} />
         {/* Load all admin pages */}
         <Route path="/*" element={<AdminRoutes />} />
       </Routes>

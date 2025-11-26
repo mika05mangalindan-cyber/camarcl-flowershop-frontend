@@ -277,7 +277,18 @@ export default function Sidebar() {
                   <NavLink to="/account-settings" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 w-full px-4 py-2 text-gray-700 hover:bg-gray-100">
                     <IconSettings /> Settings
                   </NavLink>
-                  <button onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 focus:outline-none">
+                  <button
+                    onClick={async () => {
+                      try {
+                        await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+
+                        window.location.reload(); 
+                      } catch (err) {
+                        console.error("Logout failed:", err);
+                      }
+                    }}
+                    className="flex items-center gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 focus:outline-none"
+                  >
                     <IconLogout /> Logout
                   </button>
                 </div>
