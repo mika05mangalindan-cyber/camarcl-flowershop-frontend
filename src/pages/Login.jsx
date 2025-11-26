@@ -43,7 +43,7 @@ export default function Login({ onLogin }) {
       {/* Left side image */}
       <div className="hidden md:flex md:w-1/2 bg-green-700 items-center justify-center">
         <img
-          src="/plant.jpg"
+          src="/display.jpg"
           alt="Login Illustration"
           className="w-full h-full object-cover rounded-r-3xl"
         />
