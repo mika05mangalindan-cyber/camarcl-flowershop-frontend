@@ -28,7 +28,7 @@ export default function Profile() {
           contact_number: res.data.contact_number || "",
         });
 
-        // Update localStorage in case it was outdated
+        // Update localStorage
         localStorage.setItem("user", JSON.stringify(res.data));
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -51,10 +51,9 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      // Keep role intact
       const updatedData = {
         ...profile,
-        role: storedUser.role, 
+        role: storedUser.role, // preserve role
       };
 
       await axios.put(`${API_URL}/users/${storedUser.id}`, updatedData, { withCredentials: true });
