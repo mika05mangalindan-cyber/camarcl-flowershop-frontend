@@ -58,33 +58,43 @@ export default function ProductForm({ editMode, selectedProduct, fetchProducts, 
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const fd = new FormData();
-      fd.append("name", form.name);
-      fd.append("price", form.price);
-      fd.append("stock", form.stock);
-      fd.append("category", form.category);
-      fd.append("description", form.description);
-      fd.append("existingImageUrl", form.existingImageUrl);
+  try {
+    const fd = new FormData();
 
-      if (image) fd.append("image", image);
+    // Append new image only if selected
+    if (image) fd.append("image", image);
 
-      if (isEditing) {
-        await axios.put(`${API_URL}/products/${selectedProduct.id}`, fd);
-      } else {
-        await axios.post(`${API_URL}/products`, fd);
-      }
+    // Always append other fields
+    fd.append("name", form.name);
+    fd.append("price", form.price);
+    fd.append("stock", form.stock);
+    fd.append("category", form.category);
+    fd.append("description", form.description);
 
-      fetchProducts();
-      resetForm();
-      cancelEdit();
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("Error submitting form");
+    // Send existing image URL if no new image selected
+    fd.append("existingImageUrl", form.existingImageUrl);
+
+    if (isEditing) {
+      await axios.put(`${API_URL}/products/${selectedProduct.id}`, fd, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+    } else {
+      await axios.post(`${API_URL}/products`, fd, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
     }
-  };
+
+    fetchProducts();
+    resetForm();
+    cancelEdit();
+  } catch (err) {
+    console.error("Submit error:", err);
+    alert("Error submitting form");
+  }
+};
+
 
   return (
     <form
