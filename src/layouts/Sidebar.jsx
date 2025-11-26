@@ -55,10 +55,15 @@ export default function Sidebar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-
+  const [user, setUser] = useState(null);
   const socketRef = useRef(null);
   const audioRef = useRef(null);
 
+  
+  useEffect(() => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) setUser(JSON.parse(storedUser));
+    }, []);
 
   useEffect(() => {
     const a = new Audio("/notification.mp3");
@@ -271,7 +276,7 @@ export default function Sidebar() {
                 aria-expanded={userMenuOpen}
               >
                 <IconUser />
-                <span className="hidden sm:block font-medium">{user?.name || "Admin User"}</span>
+                <span className="hidden sm:block font-medium">{user?.name || "Admin"}</span>
               </button>
 
               {userMenuOpen && (
