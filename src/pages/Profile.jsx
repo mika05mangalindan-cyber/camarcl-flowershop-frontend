@@ -8,6 +8,9 @@ const FiX = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiX 
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 
 export default function Profile() {
+  const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = loggedInUser.id;
+
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -18,16 +21,18 @@ export default function Profile() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/admin/profile`, { withCredentials: true });
+      const res = await axios.get(`${API_URL}/users/${userId}`, { withCredentials: true });
       setProfile(res.data);
     } catch (err) {
       console.error("Error fetching profile:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -36,14 +41,14 @@ export default function Profile() {
 
   const handleSave = useCallback(async () => {
     try {
-      await axios.put(`${API_URL}/admin/profile`, profile, { withCredentials: true });
+      await axios.put(`${API_URL}/users/${userId}`, profile, { withCredentials: true });
       setEditMode(false);
       alert("Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);
       alert("Failed to update profile.");
     }
-  }, [profile]);
+  }, [userId, profile]);
 
   if (loading) {
     return (
@@ -88,7 +93,7 @@ export default function Profile() {
                   <button
                     type="button"
                     onClick={handleSave}
-                    className="flex items-center gap-2 w-full sm:w-auto justify-center bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="flex items-center gap-2 w-full justify-center bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <FiSave className="w-5 h-5" />
                     Save Changes
@@ -96,7 +101,7 @@ export default function Profile() {
                   <button
                     type="button"
                     onClick={() => setEditMode(false)}
-                    className="flex items-center gap-2 w-full sm:w-auto justify-center bg-gray-300 px-5 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    className="flex items-center gap-2 w-full justify-center bg-gray-300 px-5 py-3 rounded-lg hover:bg-gray-400 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
                   >
                     <FiX className="w-5 h-5" />
                     Cancel
@@ -106,7 +111,7 @@ export default function Profile() {
                 <button
                   type="button"
                   onClick={() => setEditMode(true)}
-                  className="flex items-center gap-2 w-full sm:w-auto justify-center bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex items-center gap-2 w-full justify-center bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <FiEdit2 className="w-5 h-5" />
                   Edit Profile
