@@ -17,7 +17,6 @@ const getStatusColor = (status) => {
   }
 };
 
-
 const OrderCard = memo(({ order, onStatusChange }) => (
   <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 hover:bg-blue-50 transition-transform duration-200">
     <h2 className="font-semibold text-lg mb-3">{order.user_name}</h2>
@@ -117,7 +116,7 @@ export default function Orders() {
 
   const handleStatusChange = useCallback(async (orderId, newStatus) => {
     try {
-      await axios.put(`${ORDERS_API}/${orderId}/status`, { status: newStatus }); // ✅ use ORDERS_API
+      await axios.put(`${ORDERS_API}/${orderId}/status`, { status: newStatus }); 
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     } catch (err) { console.error(err); }
   }, []);
