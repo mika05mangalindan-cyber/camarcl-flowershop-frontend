@@ -28,11 +28,16 @@ export default function Profile() {
           contact_number: res.data.contact_number || "",
         });
 
-        // Update localStorage
-        localStorage.setItem("user", JSON.stringify(res.data));
+        // Update localStorage with ID and role intact
+        localStorage.setItem("user", JSON.stringify({
+          id: res.data.id,
+          name: res.data.name,
+          email: res.data.email,
+          contact_number: res.data.contact_number,
+          role: res.data.role
+        }));
       } catch (err) {
         console.error("Error fetching profile:", err);
-        // fallback to stored values
         setProfile({
           name: storedUser.name || "",
           email: storedUser.email || "",
@@ -58,8 +63,12 @@ export default function Profile() {
 
       await axios.put(`${API_URL}/users/${storedUser.id}`, updatedData, { withCredentials: true });
 
-      // Update localStorage
-      localStorage.setItem("user", JSON.stringify(updatedData));
+      // Update localStorage with ID and role intact
+      localStorage.setItem("user", JSON.stringify({
+        id: storedUser.id,
+        ...profile,
+        role: storedUser.role
+      }));
 
       setEditMode(false);
       alert("Profile updated successfully!");
