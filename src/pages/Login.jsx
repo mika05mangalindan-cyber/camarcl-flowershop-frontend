@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
+console.log("API_URL = ", process.env.REACT_APP_API_URL);
+
+
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
