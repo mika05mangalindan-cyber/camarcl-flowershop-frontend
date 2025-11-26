@@ -11,9 +11,7 @@ export default function App() {
 
   useEffect(() => {
     axios.get(`${API_URL}/dashboard`)
-      .then(res => {
-        setUser(res.data.user);
-      })
+      .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 

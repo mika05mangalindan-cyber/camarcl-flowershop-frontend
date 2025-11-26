@@ -3,31 +3,33 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = process.env.REACT_APP_API_URL;
-axios.defaults.withCredentials = true; // IMPORTANT
 
-
-
+// Ensure credentials (cookies) are sent with requests
+axios.defaults.withCredentials = true;
 
 export default function Login({ onLogin }) {
-
-  console.log("onLogin prop =", onLogin);
-
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Debug prop
+  console.log("Login component onLogin prop:", onLogin);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-     try {
-    const res = await axios.post(
-      `${API_URL}/login`,
-      { email, password },
-      { withCredentials: true }
-    );
+    if (!onLogin || typeof onLogin !== "function") {
+      console.error("onLogin prop is missing or not a function!");
+      setError("Login handler not configured properly.");
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${API_URL}/login`, { email, password });
+
       const user = res.data.user;
 
       if (!user) {
@@ -35,27 +37,37 @@ export default function Login({ onLogin }) {
         return;
       }
 
+      // Pass user info back to App.jsx
       onLogin(user);
+
       navigate("/dashboard");
     } catch (err) {
-      console.log("LOGIN ERROR:", err);
+      console.error("LOGIN ERROR:", err);
       setError(err.response?.data?.error || "Login failed. Try again.");
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Left side image */}
       <div className="hidden md:flex md:w-1/2 bg-green-700 items-center justify-center">
-        <img src="/plant.jpg" alt="Login Illustration" className="w-full h-full object-cover" />
+        <img
+          src="/plant.jpg"
+          alt="Login Illustration"
+          className="w-full h-full object-cover"
+        />
       </div>
 
+      {/* Login form */}
       <div className="flex flex-1 items-center justify-center p-6 bg-gray-50">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 md:p-12">
           <h2 className="text-3xl font-extrabold text-green-700 mb-6 text-center">
             Admin Login
           </h2>
 
-          {error && <p className="text-red-500 mb-4 text-center font-medium">{error}</p>}
+          {error && (
+            <p className="text-red-500 mb-4 text-center font-medium">{error}</p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -65,6 +77,7 @@ export default function Login({ onLogin }) {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
                 required
               />
             </div>
@@ -76,6 +89,7 @@ export default function Login({ onLogin }) {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="********"
                 required
               />
               <button
@@ -87,12 +101,13 @@ export default function Login({ onLogin }) {
               </button>
             </div>
 
-            <button className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold">
+            <button
+              type="submit"
+              className="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition"
+            >
               Login
             </button>
           </form>
-
-          
 
           <p className="text-sm text-gray-500 text-center mt-6">
             &copy; 2025 Camarcl Flowershop. All rights reserved.
