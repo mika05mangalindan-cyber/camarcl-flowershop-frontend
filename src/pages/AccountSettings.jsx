@@ -3,7 +3,8 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function AccountSettings() {
+export default function AccountSettings({ user }) {
+  // `user` should be the logged-in user's object { id, name, email, ... }
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -24,7 +25,11 @@ export default function AccountSettings() {
 
     try {
       setLoading(true);
-      await axios.put(`${API_URL}/admin/change-password`, passwords);
+      // Call your backend PUT /users/:id to update password
+      await axios.put(`${API_URL}/users/${user.id}`, {
+        password: passwords.newPassword,
+      });
+
       setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
       alert("Password updated successfully!");
     } catch (err) {
@@ -39,7 +44,7 @@ export default function AccountSettings() {
     if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
 
     try {
-      await axios.delete(`${API_URL}/admin/delete-account`);
+      await axios.delete(`${API_URL}/users/${user.id}`);
       alert("Account deleted successfully!");
       window.location.href = "/";
     } catch (err) {
@@ -56,10 +61,12 @@ export default function AccountSettings() {
           Account Settings
         </h1>
 
-
         <section className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-6">
           <h2 className="text-2xl font-semibold text-gray-700">Change Password</h2>
-          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }}>
+          <form
+            className="space-y-4"
+            onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }}
+          >
             {["currentPassword", "newPassword", "confirmPassword"].map((field, idx) => (
               <div key={idx} className="flex flex-col">
                 <label htmlFor={field} className="text-sm text-gray-500 font-medium">
@@ -88,7 +95,6 @@ export default function AccountSettings() {
           </form>
         </section>
 
-     
         <section className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 space-y-4 border border-red-100">
           <h2 className="text-2xl font-semibold text-gray-700">Delete Account</h2>
           <p className="text-sm text-gray-500">

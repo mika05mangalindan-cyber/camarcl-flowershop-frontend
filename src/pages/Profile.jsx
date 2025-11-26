@@ -3,26 +3,22 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-
-const FiUser = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiUser })));
 const FiSave = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiSave })));
 const FiX = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiX })));
 const FiEdit2 = lazy(() => import("react-icons/fi").then(mod => ({ default: mod.FiEdit2 })));
 
 export default function Profile() {
   const [profile, setProfile] = useState({
-    first_name: "",
-    middle_name: "",
-    last_name: "",
+    name: "",
     email: "",
-    contact: "",
+    contact_number: "",
   });
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/admin/profile`);
+      const res = await axios.get(`${API_URL}/admin/profile`, { withCredentials: true });
       setProfile(res.data);
     } catch (err) {
       console.error("Error fetching profile:", err);
@@ -40,11 +36,12 @@ export default function Profile() {
 
   const handleSave = useCallback(async () => {
     try {
-      await axios.put(`${API_URL}/admin/profile`, profile);
+      await axios.put(`${API_URL}/admin/profile`, profile, { withCredentials: true });
       setEditMode(false);
       alert("Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);
+      alert("Failed to update profile.");
     }
   }, [profile]);
 
@@ -62,30 +59,11 @@ export default function Profile() {
         <h1 className="text-3xl font-bold text-green-700 mb-6">Profile</h1>
 
         <section className="bg-white shadow-sm sm:shadow-md lg:shadow-lg rounded-2xl p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {["first_name", "middle_name", "last_name"].map(field => (
-              <div key={field}>
-                <label htmlFor={field} className="text-sm text-gray-500 capitalize">{field.replace("_", " ")}</label>
-                {editMode ? (
-                  <input
-                    id={field}
-                    name={field}
-                    value={profile[field]}
-                    onChange={handleChange}
-                    className="mt-1 w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                ) : (
-                  <p className="mt-1 font-medium text-gray-700">{profile[field] || "-"}</p>
-                )}
-              </div>
-            ))}
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {["email", "contact"].map(field => (
+            {["name", "email", "contact_number"].map(field => (
               <div key={field}>
-                <label htmlFor={field} className="text-sm text-gray-500">
-                  {field === "email" ? "Email Address:" : "Contact Number:"}
+                <label htmlFor={field} className="text-sm text-gray-500 capitalize">
+                  {field === "name" ? "Full Name" : field === "email" ? "Email Address" : "Contact Number"}
                 </label>
                 {editMode ? (
                   <input
