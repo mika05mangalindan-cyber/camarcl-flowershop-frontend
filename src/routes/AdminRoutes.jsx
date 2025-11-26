@@ -30,20 +30,86 @@ const AdminRoutes = () => {
 
   return (
     <Routes>
-      {/* Public login page */}
-      <Route path="/login" element={<Login />} />
+      {/* Public login page with onLogin handler */}
+      <Route
+        path="/login"
+        element={
+          <Login
+            onLogin={(user) => {
+              // Save user info to localStorage
+              localStorage.setItem("user", JSON.stringify(user));
+              // Redirect to dashboard after login
+              window.location.href = "/dashboard";
+            }}
+          />
+        }
+      />
 
       {/* Protected admin routes */}
-      <Route path="dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
-      <Route path="products" element={<ProtectedLayout><Products /></ProtectedLayout>} />
-      <Route path="orders" element={<ProtectedLayout><Orders /></ProtectedLayout>} />
-      <Route path="inventory" element={<ProtectedLayout><Inventory /></ProtectedLayout>} />
-      <Route path="users" element={<ProtectedLayout><Users /></ProtectedLayout>} />
-      <Route path="profile" element={<ProtectedLayout><Profile /></ProtectedLayout>} />
-      <Route path="account-settings" element={<ProtectedLayout><AccountSettings /></ProtectedLayout>} />
+      <Route
+        path="dashboard"
+        element={
+          <ProtectedLayout>
+            <Dashboard />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="products"
+        element={
+          <ProtectedLayout>
+            <Products />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="orders"
+        element={
+          <ProtectedLayout>
+            <Orders />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="inventory"
+        element={
+          <ProtectedLayout>
+            <Inventory />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="users"
+        element={
+          <ProtectedLayout>
+            <Users />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="profile"
+        element={
+          <ProtectedLayout>
+            <Profile />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="account-settings"
+        element={
+          <ProtectedLayout>
+            <AccountSettings />
+          </ProtectedLayout>
+        }
+      />
 
       {/* Catch-all redirect */}
-      <Route path="*" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
+      <Route
+        path="*"
+        element={
+          isLoggedIn ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+        }
+      />
     </Routes>
   );
 };
