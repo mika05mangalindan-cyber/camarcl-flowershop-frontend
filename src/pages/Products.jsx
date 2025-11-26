@@ -130,7 +130,7 @@ export default function Products() {
   const searchedProducts = useMemo(() => currentProducts.filter(p => p.name.toLowerCase().includes(searchQuery)), [currentProducts, searchQuery]);
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  // Refresh form after add/update/cancel
+
   const handleFormSuccess = async () => {
     setEditMode(false);
     setSelectedProduct(null);
@@ -148,8 +148,9 @@ export default function Products() {
       {/* Product Form */}
       <ProductForm
         key={selectedProduct?.id || "new"}
-        product={selectedProduct}
-          fetchProducts={fetchProducts}
+        editMode={editMode}
+        selectedProduct={selectedProduct}
+        fetchProducts={fetchProducts}
         onSuccess={handleFormSuccess}
         cancelEdit={handleCancelEdit}
       />
