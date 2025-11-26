@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from "react";
+import React, { useState, Suspense, lazy, useEffect } from "react";
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -25,10 +25,19 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      await axios.put(`${API_URL}/users/${storedUser.id}`, profile, { withCredentials: true });
+      // Only update name, email, contact_number — do NOT touch role
+      const updateData = {
+        name: profile.name,
+        email: profile.email,
+        contact_number: profile.contact_number,
+      };
 
-      // Update localStorage
-      localStorage.setItem("user", JSON.stringify({ ...storedUser, ...profile }));
+      await axios.put(`${API_URL}/users/${storedUser.id}`, updateData, { withCredentials: true });
+
+      // Update localStorage while keeping role intact
+      const updatedUser = { ...storedUser, ...updateData };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
       setEditMode(false);
       alert("Profile updated successfully!");
