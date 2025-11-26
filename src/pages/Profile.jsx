@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -11,12 +11,38 @@ export default function Profile() {
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   const [profile, setProfile] = useState({
-    name: storedUser.name || "",
-    email: storedUser.email || "",
-    contact_number: storedUser.contact_number || "",
+    name: "",
+    email: "",
+    contact_number: "",
   });
-
   const [editMode, setEditMode] = useState(false);
+
+  // Fetch user info from backend
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/users/${storedUser.id}`, { withCredentials: true });
+        setProfile({
+          name: res.data.name || "",
+          email: res.data.email || "",
+          contact_number: res.data.contact_number || "",
+        });
+
+        // Update localStorage in case it was outdated
+        localStorage.setItem("user", JSON.stringify(res.data));
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        // fallback to stored values
+        setProfile({
+          name: storedUser.name || "",
+          email: storedUser.email || "",
+          contact_number: storedUser.contact_number || "",
+        });
+      }
+    };
+
+    if (storedUser.id) fetchUser();
+  }, [storedUser.id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,19 +51,16 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      // Only update name, email, contact_number — do NOT touch role
-      const updateData = {
-        name: profile.name,
-        email: profile.email,
-        contact_number: profile.contact_number,
+      // Keep role intact
+      const updatedData = {
+        ...profile,
+        role: storedUser.role, 
       };
 
-      await axios.put(`${API_URL}/users/${storedUser.id}`, updateData, { withCredentials: true });
+      await axios.put(`${API_URL}/users/${storedUser.id}`, updatedData, { withCredentials: true });
 
-      // Update localStorage while keeping role intact
-      const updatedUser = { ...storedUser, ...updateData };
-
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      // Update localStorage
+      localStorage.setItem("user", JSON.stringify(updatedData));
 
       setEditMode(false);
       alert("Profile updated successfully!");
