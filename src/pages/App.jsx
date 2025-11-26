@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Login from "/Login";
-import Dashboard from "/Dashboard";
+import Login from "./Login";
+import Dashboard from "./Dashboard";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -10,7 +10,7 @@ export default function App() {
 
   // Check session on load
   useEffect(() => {
-    axios.get(`${API_URL}/dashboard`, { withCredentials: true })
+    axios.get(`${API_URL}dashboard`, { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
