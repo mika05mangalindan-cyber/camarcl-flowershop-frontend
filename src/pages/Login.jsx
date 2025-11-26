@@ -5,7 +5,13 @@ import { useNavigate } from "react-router-dom";
 const API_URL = process.env.REACT_APP_API_URL;
 axios.defaults.withCredentials = true; // IMPORTANT
 
+
+
+
 export default function Login({ onLogin }) {
+
+  console.log("onLogin prop =", onLogin);
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,6 +91,8 @@ export default function Login({ onLogin }) {
               Login
             </button>
           </form>
+
+          
 
           <p className="text-sm text-gray-500 text-center mt-6">
             &copy; 2025 Camarcl Flowershop. All rights reserved.
