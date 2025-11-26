@@ -22,12 +22,12 @@ export default function Login({ onLogin }) {
     e.preventDefault();
     setError("");
 
-    try {
-      const res = await axios.post(`${API_URL}/login`, {
-        email,
-        password
-      });
-
+     try {
+    const res = await axios.post(
+      `${API_URL}/login`,
+      { email, password },
+      { withCredentials: true }
+    );
       const user = res.data.user;
 
       if (!user) {
