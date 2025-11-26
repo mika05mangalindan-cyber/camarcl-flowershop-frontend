@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
 const API_URL = process.env.REACT_APP_API_URL;
 axios.defaults.withCredentials = true;
