@@ -41,7 +41,7 @@ export default function Login({ onLogin }) {
       {/* Left side image */}
       <div className="hidden md:flex md:w-1/2 bg-green-700 items-center justify-center">
         <img
-          src="../public/logo.png" // put logo in public folder
+          src="./public/logo.png"
           alt="Login Illustration"
           className="max-w-xs md:max-w-md mx-auto"
         />
