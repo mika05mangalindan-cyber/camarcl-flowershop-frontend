@@ -43,7 +43,7 @@ export default function Login({ onLogin }) {
         <img
           src="/plant.jpg"
           alt="Login Illustration"
-          className="max-w-xs md:max-w-md mx-auto"
+          className="w-full h-full object-cover"
         />
       </div>
 
