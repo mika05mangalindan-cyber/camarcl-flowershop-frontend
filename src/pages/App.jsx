@@ -10,7 +10,7 @@ export default function App() {
 
   // Check session on load
   useEffect(() => {
-    axios.get(`${API_URL}dashboard`, { withCredentials: true })
+    axios.get(`${API_URL}/dashboard`, { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
