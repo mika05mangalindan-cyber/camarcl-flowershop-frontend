@@ -46,7 +46,7 @@ export default function Login({ onLogin }) {
         <img
           src="/plant.jpg"
           alt="Login Illustration"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-cover"
         />
       </div>
 
