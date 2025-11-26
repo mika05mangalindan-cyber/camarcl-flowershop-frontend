@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function AccountSettings({ user }) {
-  // `user` should be the logged-in user's object { id, name, email, ... }
+export default function AccountSettings() {
+  // Get logged-in user from localStorage
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const [user, setUser] = useState(storedUser);
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -12,12 +15,35 @@ export default function AccountSettings({ user }) {
   });
   const [loading, setLoading] = useState(false);
 
+  // Fetch latest user info from backend
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        if (!storedUser.id) return;
+        const res = await axios.get(`${API_URL}/users/${storedUser.id}`, { withCredentials: true });
+        setUser(res.data);
+
+        // Keep localStorage in sync
+        localStorage.setItem("user", JSON.stringify(res.data));
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
+
+    fetchUser();
+  }, [storedUser.id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPasswords({ ...passwords, [name]: value });
   };
 
   const handleChangePassword = async () => {
+    if (!user.id) {
+      alert("User not found.");
+      return;
+    }
+
     if (passwords.newPassword !== passwords.confirmPassword) {
       alert("New password and confirm password do not match!");
       return;
@@ -25,10 +51,15 @@ export default function AccountSettings({ user }) {
 
     try {
       setLoading(true);
-      // Call your backend PUT /users/:id to update password
+
+      // Update password via backend
       await axios.put(`${API_URL}/users/${user.id}`, {
         password: passwords.newPassword,
-      });
+        role: user.role, // preserve role
+        name: user.name, // preserve existing info
+        email: user.email,
+        contact_number: user.contact_number,
+      }, { withCredentials: true });
 
       setPasswords({ currentPassword: "", newPassword: "", confirmPassword: "" });
       alert("Password updated successfully!");
@@ -41,11 +72,14 @@ export default function AccountSettings({ user }) {
   };
 
   const handleDeleteAccount = async () => {
+    if (!user.id) return;
+
     if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
 
     try {
-      await axios.delete(`${API_URL}/users/${user.id}`);
+      await axios.delete(`${API_URL}/users/${user.id}`, { withCredentials: true });
       alert("Account deleted successfully!");
+      localStorage.removeItem("user");
       window.location.href = "/";
     } catch (err) {
       console.error("Error deleting account:", err);
