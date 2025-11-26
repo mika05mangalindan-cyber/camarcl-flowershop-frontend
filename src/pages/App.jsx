@@ -4,20 +4,20 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 
 const API_URL = process.env.REACT_APP_API_URL;
+axios.defaults.withCredentials = true;
 
 export default function App() {
   const [user, setUser] = useState(null);
 
-  // Check session on load
   useEffect(() => {
-    axios.get(`${API_URL}/dashboard`, { withCredentials: true })
-      .then(res => setUser(res.data.user))
+    axios.get(`${API_URL}/dashboard`)
+      .then(res => {
+        setUser(res.data.user);
+      })
       .catch(() => setUser(null));
   }, []);
 
-  if (!user) {
-    return <Login onLogin={setUser} />;
-  }
+  if (!user) return <Login onLogin={setUser} />;
 
   return <Dashboard user={user} />;
 }
