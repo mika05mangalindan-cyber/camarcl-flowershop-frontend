@@ -10,14 +10,16 @@ export default function ProductForm({ editMode, selectedProduct, fetchProducts, 
     stock: "",
     category: "",
     description: "",
-    existingImageUrl: ""
+    existingImageUrl: "",
   };
 
   const [form, setForm] = useState(initialForm);
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
   const isEditing = editMode && selectedProduct;
 
-  // Populate form if editing
+
   useEffect(() => {
     if (isEditing) {
       setForm({
@@ -26,8 +28,10 @@ export default function ProductForm({ editMode, selectedProduct, fetchProducts, 
         stock: selectedProduct.stock,
         category: selectedProduct.category,
         description: selectedProduct.description,
-        existingImageUrl: selectedProduct.image_url
+        existingImageUrl: selectedProduct.image_url,
       });
+
+      setPreview(selectedProduct.image_url);
       setImage(null);
     } else {
       resetForm();
@@ -38,13 +42,24 @@ export default function ProductForm({ editMode, selectedProduct, fetchProducts, 
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   const resetForm = () => {
     setForm(initialForm);
     setImage(null);
+    setPreview(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const fd = new FormData();
       fd.append("name", form.name);
@@ -63,43 +78,113 @@ export default function ProductForm({ editMode, selectedProduct, fetchProducts, 
       }
 
       fetchProducts();
-      resetForm();       // Reset form after add/update
-      cancelEdit();      // Exit edit mode if applicable
+      resetForm();
+      cancelEdit();
     } catch (err) {
       console.error("Submit error:", err);
-      alert("Failed to submit");
+      alert("Error submitting form");
     }
   };
 
-  const handleCancel = () => {
-    resetForm();
-    cancelEdit();        // Exit edit mode
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-4 bg-white rounded-xl shadow-md mb-4">
-      <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required className="border rounded px-2 py-1" />
-      <input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} required className="border rounded px-2 py-1" />
-      <input name="stock" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} required className="border rounded px-2 py-1" />
-      <input name="category" placeholder="Category" value={form.category} onChange={handleChange} className="border rounded px-2 py-1" />
-      <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="border rounded px-2 py-1" />
-      <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} required={!isEditing} className="mt-1" />
-      {isEditing && form.existingImageUrl && (
-        <img src={form.existingImageUrl} alt="current" className="w-20 h-20 object-cover mt-2" />
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-2 p-4 bg-white rounded-xl shadow-md mb-4"
+    >
+      <input
+        name="name"
+        placeholder="Name"
+        value={form.name}
+        onChange={handleChange}
+        required
+        className="border rounded px-2 py-1"
+      />
+
+      <input
+        name="price"
+        type="number"
+        placeholder="Price"
+        value={form.price}
+        onChange={handleChange}
+        required
+        className="border rounded px-2 py-1"
+      />
+
+      <input
+        name="stock"
+        type="number"
+        placeholder="Stock"
+        value={form.stock}
+        onChange={handleChange}
+        required
+        className="border rounded px-2 py-1"
+      />
+
+      <input
+        name="category"
+        placeholder="Category"
+        value={form.category}
+        onChange={handleChange}
+        className="border rounded px-2 py-1"
+      />
+
+      <textarea
+        name="description"
+        placeholder="Description"
+        value={form.description}
+        onChange={handleChange}
+        className="border rounded px-2 py-1"
+      />
+
+      {/* Image Upload */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImage}
+        required={!isEditing}
+        className="mt-1"
+      />
+
+      {/* Image Preview */}
+      {preview && (
+        <img
+          src={preview}
+          alt="preview"
+          className="w-24 h-24 object-cover rounded mt-2 border"
+        />
       )}
-      <div className="flex gap-2 mt-2">
-        <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded-md">
-          {isEditing ? "Update Product" : "Add Product"}
+
+      {/* Buttons */}
+      {!isEditing ? (
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 rounded-md mt-2 w-full"
+        >
+          Add Product
         </button>
-        {isEditing && (
-          <button type="button" onClick={handleCancel} className="bg-gray-400 text-white px-3 py-1 rounded-md">
+      ) : (
+
+        <div className="flex gap-2 mt-2">
+          <button
+            type="submit"
+            className="flex-1 bg-green-600 text-white py-2 rounded-md"
+          >
+            Update
+          </button>
+
+          <button
+            type="button"
+            onClick={cancelEdit}
+            className="flex-1 bg-gray-500 text-white py-2 rounded-md"
+          >
             Cancel
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </form>
   );
 }
+
 
 
 

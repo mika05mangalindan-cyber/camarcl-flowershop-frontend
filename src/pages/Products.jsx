@@ -149,6 +149,7 @@ export default function Products() {
       <ProductForm
         key={selectedProduct?.id || "new"}
         product={selectedProduct}
+          fetchProducts={fetchProducts}
         onSuccess={handleFormSuccess}
         cancelEdit={handleCancelEdit}
       />
